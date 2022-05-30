@@ -7,11 +7,8 @@
   %\def\familydefault{\rmdefault}    % uncomment for serif fonts in body
   \narrowmargins                    % uncomment for narrow margins
   \symmetricmargins                 % uncomment for equal margins
-  \unitname{%                         % footer, typically Faculty
-  EDIC \\
-  Idiap Research Institute \\
-  Machine Learning Group
-  }{}{}
+  \unitname{EDIC}{Idiap Research Institute}{Machine Learning Group}{EE-452 : Network Machine Learning}
+  
 \usepackage[document]{ragged2e}
 \usepackage{anyfontsize}
 \usepackage{titling}
@@ -26,8 +23,7 @@
 \definecolor{red}{HTML}{c0392b}
 
 
-\newcommand{\ap}[1]{\marginpar{{\tiny \color{purple} [AP] #1}}}
-
+\newcommand{\ap}[1]{\marginpar{{\tiny \color{red} [AP] #1}}}
 \title{Graph Networks for Wind Nowcasting}
 \author{Arnaud Pannatier}
 \begin{document}
@@ -49,6 +45,8 @@
 
 \section{Introduction}
 
+
+Test
 Air Traffic Controllers (ATC) need to have access to reliable wind speed forecasts to organize the airspace efficiently. However, at cruising altitudes, the only measures that one has access to are measured by airplanes that record the wind along their trajectories. Therefore, air traffic controllers need to have very short-term forecasts of about 30 minutes. In that range, called nowcasting, one gets the most accurate forecast by extrapolating from the latest measures available rather than trying to solve expensive numerical equations solvers. It is in that range that deep learning methods can offer a lot, as meteorological data is often highly available, and deep learning methods thrive in that environment.
 
 \section{Related works}
@@ -57,12 +55,12 @@ Air Traffic Controllers (ATC) need to have access to reliable wind speed forecas
 
 Traditional PDEs solvers are model the domain using regular grids, but this has some drawbacks as some part of the space might be more complicated to model than the other. One way of dealing with this problem is to use a Finite Element method approach \cite{hughes2012finite}, which uses a non-regular graph that can be denser in the more complex regions and coarser in the smoother regions.
 
-\ap{advantages / drawbacks}
+\ap{advantages --drawbacks}
 
 \subsection{Graph Element Networks (GENs)} \label{ssec:gen}
 Graph Element Networks \cite{alet2019gen} aim to model SFTs using a non-regular graphs with nodes in the underlying space $\mathbb{X}$. Each measurement $(x, i)$ is encoded using a small MLP and contributes to the neighbouring nodes values. The model then process this latent variable using $T \in \mathbb{N}$ steps of message passing, the exact formulation of its message passing scheme can be found in the appendix.
 In order to predict at a new query position, the model linearly extrapolates in latent space, and decodes using a small MLP modelling the transformation from latent to output space.
-\ap{advantages / drawbacks}
+\ap{advantages -- drawbacks}
 
 \section{Problem formulation}
 
@@ -71,9 +69,9 @@ In order to predict at a new query position, the model linearly extrapolates in 
 % The goal of this section is to analyze the data, and get insights about the tools that will help in the learning section: what handcrafted features could be useful? If you use graph neural networks, what parametrization should be used?
 
 \begin{itemize}
-  \item We want our graph to represent the state of the space
-  \item Features : field values
-  \item Edge features : derivatives ?
+  %  \item We want our graph to represent the state of the space
+  %  \item Features : field values
+  %  \item Edge features : derivatives ?
   \item Setting up the graph : Kmeans + nearest neighbors // scale free network based on the variation of the field
   \item Connected graph
   \item Expect local connections but ablation
