@@ -1,0 +1,11 @@
+name: extrinsic-transformer
+dependencies:
+  - python=3.9
+  - pytorch::pytorch=1.10
+  - pytorch::torchvision
+  - cudatoolkit=11.3
+  - black
+  - tqdm
+  - pyyaml
+  - hyp5
+  - matplotlib
