@@ -4,7 +4,7 @@
 %\def\familydefault{\rmdefault}    % uncomment for serif fonts in body
 
 \title{Graph Networks for Wind Nowcasting}
-\subtitle{Test}
+\subtitle{ Graph Networks offer a flexible way of handling non-regular dataset such as sparse measures in the 3D space.}
 \author{Arnaud Pannatier}
 \narrowmargins                    % uncomment for narrow margins
 \symmetricmargins                 % uncomment for equal margins
@@ -18,12 +18,20 @@
 \maketitle
 
 \section{Introduction}
-
-
-Test
 Air Traffic Controllers (ATC) need to have access to reliable wind speed forecasts to organize the airspace efficiently. However, at cruising altitudes, the only measures that one has access to are measured by airplanes that record the wind along their trajectories. Therefore, air traffic controllers need to have very short-term forecasts of about 30 minutes. In that range, called nowcasting, one gets the most accurate forecast by extrapolating from the latest measures available rather than trying to solve expensive numerical equations solvers. It is in that range that deep learning methods can offer a lot, as meteorological data is often highly available, and deep learning methods thrive in that environment.
 
+\subsection{Problem formulation}
+
+Let $\mathbb{X}, \mathbb{I}, \mathbb{O}$ be three bounded metric spaces, and define two functions $f : \mathbb{X}\rightarrow \mathbb{I}$, mapping from data to the input space, and $g : \mathbb{X}\rightarrow \mathbb{O}$ mapping to the output space.
+In the case of wind nowcasting, $\mathbb{X} = \mathbb{R}^{3} \times \mathbb{R}^{+}$, which corresponds to 3 spatial coordinates and one temporal and $\mathbb{I} = \mathbb{O} = \mathbb{R}^{2}$ which encode the wind in the $(x,y)$ plane. We want to learn the transformation which maps a function $f$ to $g$. We only have access to $f$ by data $(x, i)  \in \mathbb{X} \times \mathbb{I}$ of measures $i$ at position $x$ and we know $g$ only through a set $(x', o) \in \mathbb{X} \times \mathbb{O}$ of measurements $o$ at position $x'$. So we learn SFTs from data using multiple sets of meaures corresponding to many $(f,g)$ pairs with the objective of minimizing the distance in the output metric space $\mathbb{O}$ between predictions and references.
+
 \section{Related works}
+
+
+\subsection{Graph Element Networks (GENs)} \label{ssec:gen}
+Graph Element Networks \cite{alet2019gen} aim to model SFTs using a non-regular graphs with nodes in the underlying space $\mathbb{X}$. Each measurement $(x, i)$ is encoded using a small MLP and contributes to the neighbouring nodes values. The model then process this latent variable using $T \in \mathbb{N}$ steps of message passing, the exact formulation of its message passing scheme can be found in the appendix.
+In order to predict at a new query position, the model linearly extrapolates in latent space, and decodes using a small MLP modelling the transformation from latent to output space.
+\ap{advantages -- drawbacks}
 
 \subsection{Finite Element Networks}
 
@@ -31,28 +39,10 @@ Traditional PDEs solvers are model the domain using regular grids, but this has 
 
 \ap{advantages --drawbacks}
 
-\subsection{Graph Element Networks (GENs)} \label{ssec:gen}
-Graph Element Networks \cite{alet2019gen} aim to model SFTs using a non-regular graphs with nodes in the underlying space $\mathbb{X}$. Each measurement $(x, i)$ is encoded using a small MLP and contributes to the neighbouring nodes values. The model then process this latent variable using $T \in \mathbb{N}$ steps of message passing, the exact formulation of its message passing scheme can be found in the appendix.
-In order to predict at a new query position, the model linearly extrapolates in latent space, and decodes using a small MLP modelling the transformation from latent to output space.
-\ap{advantages -- drawbacks}
-
-\section{Problem formulation}
 
 \section{Exploration}
 % (30 points)
 % The goal of this section is to analyze the data, and get insights about the tools that will help in the learning section: what handcrafted features could be useful? If you use graph neural networks, what parametrization should be used?
-
-\begin{itemize}
-  %  \item We want our graph to represent the state of the space
-  %  \item Features : field values
-  %  \item Edge features : derivatives ?
-  \item Setting up the graph : Kmeans + nearest neighbors // scale free network based on the variation of the field
-  \item Connected graph
-  \item Expect local connections but ablation
-  \item comment on diameter and degree distribution
-  \item display visualization of the two networks
-  \item Compare with traditional Finite Element method
-\end{itemize}
 
 \subsection{Graph Types}
 %     \item global properties of the graph (e.g., connected components, sparsity, diameter, clusters, degree distribution, spectrum)
@@ -77,8 +67,11 @@ We will use a totally different approaches for the last graph structure, we will
 
 In this work we will focus on nodes and edges features as we are using the graph network to do regression over the whole space. We won't need to aggregate the features over the whole graph.
 
+
 \subsection{Nodes features}
 As described in section~\ref{ssec:gen}, GEN are only using nodes features that are computed by aggregating the learned embeddings of the measures based on their distance. We will visualise their value in some very unbalanced cases and the effect of message passing on the features. This will help us to choose the message passing steps and guide us through the analysis of the different graph structures.
+
+We assume that this part is the most important to get a good model. So we will explore different strategies and measure their impact on the model. First we will try to use no encoder and aggregate the normalized measured values. With this approach, we delegate the whole processing to the graph networks, and we think this should be already a strong baseline as the outputs values are strongly related to these initial values. We will then try to use fixed sine-cosine positional encodings ~\cite{vaswani2017attention} and 3D positional fixed sine-cosine positional encodings ~\cite{chu2021conditional}.
 
 \subsection{Edge features}
 A contribution of this work is to add edge features to GENs. We think that a good graph networks for space modelling should be able to compute approximation of the derivatives of values in the graph. We will take Euler scheme as an inspiration and have an explicit design for edge features that allows this kind of computation. We will make an ablation with learned features and see their effect on the quality of the model.
