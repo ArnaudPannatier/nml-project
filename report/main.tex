@@ -1,0 +1,108 @@
+\documentclass[a4paper,12pt]{article}
+\usepackage[%
+% bw,                               % uncomment for black & white
+% window,                           % uncomment for window envelope
+% corporate,                        % uncomment for a "corporate" letter
+  ]{EPFL}
+  \usepackage[document]{ragged2e}
+%\def\familydefault{\rmdefault}    % uncomment for serif fonts in body
+\narrowmargins                    % uncomment for narrow margins
+\symmetricmargins                 % uncomment for equal margins
+\unitname{%                         % footer, typically Faculty
+EDIC \\
+Idiap Research Institute \\
+Machine Learning Group
+}{}{}
+\usepackage{anyfontsize}
+\usepackage{titling}
+
+\title{Graph Element Networks for Wind Nowcasting}
+\author{Arnaud Pannatier}
+\begin{document}
+\centering
+\vspace*{0cm}
+{\fontsize{35}{60}\selectfont \bfseries \thetitle } \\
+\vspace{1cm}
+\Large \textit{ EE-452 -- project} \\
+\vspace{1cm}
+\normalfont
+\Large \theauthor \\
+\vspace{0.5cm}
+
+\scriptsize\today
+
+\normalfont\normalsize
+
+\justifying
+
+\section{Introduction}
+
+\subsection{Related works}
+
+Graph Element networks \cite{alet19gen}
+
+\section{Exploration}
+% (30 points)
+% The goal of this section is to analyze the data, and get insights about the tools that will help in the learning section: what handcrafted features could be useful? If you use graph neural networks, what parametrization should be used?
+
+\begin{itemize}
+  \item We want our graph to represent the state of the space
+  \item Features : field values
+  \item Edge features : derivatives ?
+  \item Setting up the graph : Kmeans + nearest neighbors // scale free network based on the variation of the field
+  \item Connected graph
+  \item Expect local connections but ablation
+  \item comment on diameter and degree distribution
+  \item display visualization of the two networks
+  \item Compare with traditional Finite Element method
+\end{itemize}
+
+
+% You are free to use the tools that you want. We list below some examples of properties that you can analyze:
+% \begin{itemize}
+%     \item global properties of the graph (e.g., connected components, sparsity, diameter, clusters, degree distribution, spectrum)
+%     \item the type of graph (e.g., power law, small world, regular, sampled manifold)
+%     \item properties of the nodes (e.g., clustering coefficient, modularity, centrality)
+%     \item analysis of the attributes (e.g., their distribution, smoothness, graph Fourier transform). If the task is classification, are the labels balanced?
+%     \item clustering (spectral clustering, k-means)
+% \end{itemize}
+% Vizualizations of the network may be very helpful
+\section{Exploitation}
+% (40 points)
+
+% If you plan to use graph neural networks to solve a task, remember that extensive cross validation of the architecture is expensive and may not be very informative. It it therefore important to spend time beforehand to understand what architecture should work well: what aggregation function is the most relevant for this data? What matters most: the graph structure itself, the node features, the edge features?
+
+Here the node features is the most informative, maybe the edge features depending on the exploration of 1.
+
+% You can also consider simple baselines such as logisitic regression on preprocessed features. Such baselines are often quite strong, and can give a good idea of the performance of your graph network.
+
+Have a good baseline.
+
+% Some tools that may be useful:
+
+% \begin{itemize}
+%     \item graph Fourier transform
+%     \item regularization (graph Tikhonov, graph total variation)
+%     \item dimensionality reduction (PCA, MDS, LLE, ISOMAP, Laplacian eigenmaps, t-SNE)
+% \end{itemize}
+
+% Critical evaluation of the results
+% subjective or objective (baseline, existing work)
+% state the limitations: when does the method fail?
+
+% We insist on the fact that you will be graded based on the process that led you to your final model, but not so much on the final performance that you get.
+
+\section{Communication}
+% (30 points)
+
+
+\begin{itemize}
+  \item Good report
+  \item Github
+  \item Streamlit
+\end{itemize}
+
+\bibliographystyle{apalike}
+\bibliography{main}
+
+\end{document}
