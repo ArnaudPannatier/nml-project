@@ -31,34 +31,7 @@ class GraphStructure(nn.Module):
         pos, senders, receivers = torch.load(graph)
         return cls(pos, senders, receivers, fixed)
 
-    @classmethod
-    def from_grid(cls, n, fixed):
-        x = torch.linspace(0, 1, n)
-        I, J = torch.meshgrid(x, x, indexing="ij")
-        pos = torch.cat((I.reshape(-1, 1), J.reshape(-1, 1)), dim=1)
-        idx = torch.arange(n**2).view(n, n)
-
-        senders = torch.cat(
-            (
-                idx[1:].flatten(),  # ↑
-                idx[:, :-1].flatten(),  # →
-                idx[:-1].flatten(),  # ↓
-                idx[:, 1:].flatten(),  # ←
-            )
-        )
-        receivers = torch.cat(
-            (
-                idx[:-1].flatten(),  # ↑
-                idx[:, 1:].flatten(),  # →
-                idx[1:].flatten(),  # ↓
-                idx[:, :-1].flatten(),  # ←
-            )
-        )
-        return cls(pos, senders, receivers, fixed)
-
     def to_networkx(self):
-        import networkx as nx
-
         edges = (
             torch.cat((self.senders[:, None], self.receivers[:, None]), dim=-1)
             .cpu()
@@ -67,8 +40,31 @@ class GraphStructure(nn.Module):
         pos = self.pos.detach().cpu().numpy()
         g = nx.Graph()
         g.add_edges_from(edges)
-        return g, {k: v for k, v in enumerate(pos)}
+        return g, dict(enumerate(pos))
 
+def grid(n):
+    x = torch.linspace(0, 1, n)
+    I, J = torch.meshgrid(x, x, indexing="ij")
+    pos = torch.cat((I.reshape(-1, 1), J.reshape(-1, 1)), dim=1)
+    idx = torch.arange(n**2).view(n, n)
+
+    senders = torch.cat(
+        (
+            idx[1:].flatten(),  # ↑
+            idx[:, :-1].flatten(),  # →
+            idx[:-1].flatten(),  # ↓
+            idx[:, 1:].flatten(),  # ←
+        )
+    )
+    receivers = torch.cat(
+        (
+            idx[:-1].flatten(),  # ↑
+            idx[:, 1:].flatten(),  # →
+            idx[1:].flatten(),  # ↓
+            idx[:, :-1].flatten(),  # ←
+        )
+    )
+    return pos, senders, receivers
 
 def kmeans_from_dataset(dataset, k=1000):
     choices = torch.randperm(len(dataset))[:100000]
