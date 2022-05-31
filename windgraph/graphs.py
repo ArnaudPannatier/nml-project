@@ -1,5 +1,6 @@
 from pathlib import Path
 
+import networkx as nx
 import numpy as np
 import torch
 import torch.nn as nn
@@ -79,18 +80,22 @@ def kmeans_from_dataset(dataset, k=1000):
     print(kmeans.cluster_centers_)
     np.save("centers.npy", kmeans.cluster_centers_)
 
-    return kmeans.cluster_centers_
+    return torch.tensor(kmeans.cluster_centers_)
 
 
 def neighbors_edges(pos, n=3):
     dists = np.linalg.norm(pos.T[None, :,:] - pos.T[:, None, :], axis=2)
-    n = 3
     receivers = dists.argsort()[:,1:n+1].flatten()
-    senders = np.arange(1000).repeat(n)
-    return senders, receivers
+    senders = np.arange(len(pos)).repeat(n)
+    return torch.LongTensor(senders), torch.LongTensor(receivers)
+
+def ba_edges(pos, m=3):
+    g = nx.barabasi_albert_graph(len(pos),m)
+    edge_index = torch.tensor(g.edges()).long()
+    return edge_index[:,0].contiguous(), edge_index[:,1].contiguous()
 
 def random_graph(p, k=1000):
     pos = torch.rand(3, k) * 2 -1
-    edge_index = torch.full((k,k), p).bernoulli().non_zero()
-    return pos, edge_index[:,0], edge_index[:,1]
+    edge_index = torch.full((k,k), p).bernoulli().non_zero().long()
+    return pos, edge_index[:,0].contiguous(), edge_index[:,1].contiguous()
 
