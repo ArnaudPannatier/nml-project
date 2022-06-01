@@ -1,4 +1,4 @@
-name: extrinsic-transformer
+name: windgraph
 dependencies:
   - python=3.9
   - pytorch::pytorch=1.10
@@ -9,3 +9,6 @@ dependencies:
   - pyyaml
   - hyp5
   - matplotlib
+  - networkx
+  - streamlit
+  - wandb
