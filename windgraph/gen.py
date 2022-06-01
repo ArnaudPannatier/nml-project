@@ -32,10 +32,15 @@ class GEN(nn.Module):
         num_layers,
         message_passing_steps,
         share_blocks=False,
+        custom_encoder=None,
     ):
         super().__init__()
         self.g = graph_structure
-        self.encoder = MLP(output_size, hidden_size, hidden_size, num_layers)
+        if custom_encoder:
+            self.encoder = custom_encoder
+        else:
+            self.encoder = MLP(output_size, hidden_size, hidden_size, num_layers)
+
         if share_blocks:
             self.gn_blocks = nn.ModuleList(
                 [GraphNetBlock(hidden_size, num_layers)] * message_passing_steps

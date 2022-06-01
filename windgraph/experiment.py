@@ -17,7 +17,7 @@ def run_exp(
         "--model",
         "-m",
         type=str,
-        default="transformer",
+        default="gen",
         choices=[
             "gen",
             "gen-fixed",

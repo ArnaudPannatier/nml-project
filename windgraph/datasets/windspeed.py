@@ -76,46 +76,6 @@ class BaseDataset(MalatDataset):
         return self._fid_dicts
 
 
-class WindSpeedDataset(BaseDataset):
-    stage_index = {"train": Weeks([0, 1, 2]), "val": Week(3), "test": Week(4)}
-
-
 class FourWeeksDataset(BaseDataset):
     stage_index = {"train": Weeks([0, 1, 2, 4]), "test": Day(4, 2), "val": Day(3, 3)}
-
-
-class OneWeekDataset(BaseDataset):
-    stage_index = {"train": Week(1), "test": Day(4, 2), "val": Day(3, 3)}
-
-
-class OneDayDataset(OneWeekDataset):
-    stage_index = {"train": Day(1, 3), "test": Day(4, 2), "val": Day(3, 3)}
-
-
-class One(OneWeekDataset):
-    stage_index = {"train": Day(2, 3), "test": Day(4, 2), "val": Day(3, 3)}
-
-
-class Two(OneWeekDataset):
-    stage_index = {"train": Day(3, 2), "test": Day(4, 2), "val": Day(3, 3)}
-
-
-class Three(OneWeekDataset):
-    stage_index = {"train": Day(2, 1), "test": Day(4, 2), "val": Day(3, 3)}
-
-
-class Week0(BaseDataset):
-    stage_index = {"train": Week(0), "test": Day(4, 2), "val": Day(3, 3)}
-
-
-class Week1(BaseDataset):
-    stage_index = {"train": Week(1), "test": Day(4, 2), "val": Day(3, 3)}
-
-
-class Week2(BaseDataset):
-    stage_index = {"train": Week(2), "test": Day(4, 2), "val": Day(3, 3)}
-
-
-class Week4(BaseDataset):
-    stage_index = {"train": Week(4), "test": Day(4, 2), "val": Day(3, 3)}
 

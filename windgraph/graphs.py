@@ -66,17 +66,19 @@ def grid(n):
     )
     return pos, senders, receivers
 
-def kmeans_from_dataset(dataset, k=1000):
+def kmeans_from_dataset(dataset, k=1000, path=Path("kmeans.pt")):
+    if path.exists():
+        return torch.load(path)
+
     choices = torch.randperm(len(dataset))[:100000]
     inputs, _ = dataset[choices]
     inputs = inputs[:, :3]
 
     print(inputs.shape)
     kmeans = KMeans(n_clusters=k, verbose=3).fit(inputs)
-    print(kmeans.cluster_centers_)
-    np.save("centers.npy", kmeans.cluster_centers_)
-
-    return torch.tensor(kmeans.cluster_centers_)
+    pos = torch.tensor(kmeans.cluster_centers_).float()
+    torch.save(pos, path)
+    return pos
 
 
 def neighbors_edges(pos, n=3):
@@ -94,4 +96,3 @@ def random_graph(p, k=1000):
     pos = torch.rand(3, k) * 2 -1
     edge_index = torch.full((k,k), p).bernoulli().non_zero().long()
     return pos, edge_index[:,0].contiguous(), edge_index[:,1].contiguous()
-
