@@ -1,5 +1,6 @@
 import argparse
 import datetime
+from pathlib import Path
 
 import torch
 import torch.nn as nn
@@ -7,22 +8,12 @@ from tqdm import tqdm
 
 
 def run_exp(
-    models, train_dl, val_dl, criterion=nn.MSELoss(), optimizer=torch.optim.Adam
+    model, train_dl, val_dl, criterion=nn.MSELoss(), optimizer=torch.optim.Adam
 ):
     parser = argparse.ArgumentParser(description="Windspeed Pipeline")
 
     parser.add_argument("--cuda", type=bool, default=torch.cuda.is_available())
     parser.add_argument("--nb_epochs", "-e", type=int, default=10)
-    parser.add_argument(
-        "--model",
-        "-m",
-        type=str,
-        default="gen",
-        choices=[
-            "gen",
-            "gen-fixed",
-        ],
-    )
     parser.add_argument(
         "--seed",
         "-s",
@@ -44,10 +35,9 @@ def run_exp(
     else:
         device = torch.device("cpu")
 
-    model = models[args.model]()
-
     now = datetime.datetime.now()
-    name = f"results/{args.model}-train-{now:%Y-%m-%d-%H:%M}"
+    Path("results").mkdir(exist_ok=True)
+    name = f"results/train-{now:%Y-%m-%d-%H:%M}"
     log_file = open(name + ".log", "w+", 1)
     nb_parameters = sum(p.numel() for p in model.parameters())
 

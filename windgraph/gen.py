@@ -8,12 +8,14 @@ from .mlp import MLP
 
 
 class GraphNetBlock(nn.Module):
-    def __init__(self, dim=128, l=2):
+    def __init__(self, in_dim=128, dim=128, l=2):
         super().__init__()
-        self.message = MLP(2 * dim, dim, dim, l)
-        self.node = MLP(2 * dim, dim, dim, l)
+        self.message = MLP(2 * in_dim, dim, in_dim, l)
+        self.node = MLP(2 * in_dim, dim, in_dim, l)
 
     def forward(self, nodes, senders, receivers):
+        print(senders)
+        print(receivers)
         messages = self.message(
             torch.cat((nodes[:, receivers], nodes[:, senders]), dim=-1)
         )
@@ -26,35 +28,28 @@ class GEN(nn.Module):
     def __init__(
         self,
         graph_structure,
-        input_size,
-        output_size,
-        hidden_size,
-        num_layers,
+        dim_x,
+        dim_y,
+        dim_h,
+        nlayers,
         message_passing_steps,
         share_blocks=False,
-        custom_encoder=None,
     ):
         super().__init__()
         self.g = graph_structure
-        if custom_encoder:
-            self.encoder = custom_encoder
-        else:
-            self.encoder = MLP(output_size, hidden_size, hidden_size, num_layers)
-
+        self.encoder = MLP(dim_x + dim_y, dim_h, dim_h, nlayers)
         if share_blocks:
             self.gn_blocks = nn.ModuleList(
-                [GraphNetBlock(hidden_size, num_layers)] * message_passing_steps
+                [GraphNetBlock(dim_h, dim_h, nlayers)] * message_passing_steps
             )
         else:
             self.gn_blocks = nn.ModuleList(
                 [
-                    GraphNetBlock(hidden_size, num_layers)
+                    GraphNetBlock(dim_h, dim_h, nlayers)
                     for _ in range(message_passing_steps)
                 ]
             )
-        self.decoder = MLP(
-            hidden_size + input_size, output_size, hidden_size, num_layers
-        )
+        self.decoder = MLP(dim_h + dim_x, dim_y, dim_h, nlayers)
 
     def forward(self, x, s, q):
         # (B, C, N)
@@ -71,5 +66,47 @@ class GEN(nn.Module):
         scores = self.g(q)
         # (B, T, D)
         z = scores.bmm(latents)
+        # Decoder uses q as well (not in the paper but in their code.)
+        # So it really is a CNP with
+        return self.decoder(torch.cat((z, q), dim=-1))
 
+
+class GENwoenc(nn.Module):
+    def __init__(
+        self,
+        graph_structure,
+        dim_x,
+        dim_y,
+        dim_h,
+        nlayers,
+        message_passing_steps,
+        share_blocks=False,
+    ):
+        super().__init__()
+        self.g = graph_structure
+        if share_blocks:
+            self.gn_blocks = nn.ModuleList(
+                [GraphNetBlock(dim_h, nlayers)] * message_passing_steps
+            )
+        else:
+            self.gn_blocks = nn.ModuleList(
+                [GraphNetBlock(dim_h, nlayers) for _ in range(message_passing_steps)]
+            )
+        self.decoder = MLP(dim_h + dim_x, dim_y, dim_h, nlayers)
+
+    def forward(self, x, s, q):
+        # (B, C, N)
+        scores = self.g(x)
+        # (B, C, D)
+        latents = scores.transpose(1, 2).bmm(s)
+        for block in self.gn_blocks:
+            # (B, N, D)
+            latents = block(latents, self.g.senders, self.g.receivers)
+
+        # (B, T, N)
+        scores = self.g(q)
+        # (B, T, D)
+        z = scores.bmm(latents)
+        # Decoder uses q as well (not in the paper but in their code.)
+        # So it really is a CNP with
         return self.decoder(torch.cat((z, q), dim=-1))

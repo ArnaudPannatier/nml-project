@@ -4,8 +4,13 @@ import pandas as pd
 import torch
 
 from .malat import MalatDataset
-from .windprocessing import (load_means_stds, process_df, save_count,
-                             save_means_stds, select_day)
+from .windprocessing import (
+    load_means_stds,
+    process_df,
+    save_count,
+    save_means_stds,
+    select_day,
+)
 
 Weeks = namedtuple("Weeks", ["files"])
 Week = namedtuple("Week", ["file"])
@@ -76,6 +81,17 @@ class BaseDataset(MalatDataset):
         return self._fid_dicts
 
 
-class FourWeeksDataset(BaseDataset):
-    stage_index = {"train": Weeks([0, 1, 2, 4]), "test": Day(4, 2), "val": Day(3, 3)}
+class Week0(BaseDataset):
+    stage_index = {"train": Week(0), "test": Day(4, 2), "val": Day(3, 3)}
 
+
+class Week1(BaseDataset):
+    stage_index = {"train": Week(1), "test": Day(4, 2), "val": Day(3, 3)}
+
+
+class Week2(BaseDataset):
+    stage_index = {"train": Week(2), "test": Day(4, 2), "val": Day(3, 3)}
+
+
+class Week4(BaseDataset):
+    stage_index = {"train": Week(4), "test": Day(4, 2), "val": Day(3, 3)}

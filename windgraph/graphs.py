@@ -42,6 +42,7 @@ class GraphStructure(nn.Module):
         g.add_edges_from(edges)
         return g, dict(enumerate(pos))
 
+
 def grid(n):
     x = torch.linspace(0, 1, n)
     I, J = torch.meshgrid(x, x, indexing="ij")
@@ -66,6 +67,7 @@ def grid(n):
     )
     return pos, senders, receivers
 
+
 def kmeans_from_dataset(dataset, k=1000, path=Path("kmeans.pt")):
     if path.exists():
         return torch.load(path)
@@ -82,17 +84,19 @@ def kmeans_from_dataset(dataset, k=1000, path=Path("kmeans.pt")):
 
 
 def neighbors_edges(pos, n=3):
-    dists = np.linalg.norm(pos.T[None, :,:] - pos.T[:, None, :], axis=2)
-    receivers = dists.argsort()[:,1:n+1].flatten()
-    senders = np.arange(len(pos)).repeat(n)
-    return torch.LongTensor(senders), torch.LongTensor(receivers)
+    dists = torch.norm(pos[None, :, :] - pos[:, None, :], dim=2)
+    receivers = dists.argsort()[:, 1 : n + 1].flatten()
+    senders = torch.arange(len(pos)).repeat(n)
+    return senders, receivers
+
 
 def ba_edges(pos, m=3):
-    g = nx.barabasi_albert_graph(len(pos),m)
+    g = nx.barabasi_albert_graph(len(pos), m)
     edge_index = torch.tensor(g.edges()).long()
-    return edge_index[:,0].contiguous(), edge_index[:,1].contiguous()
+    return edge_index[:, 0].contiguous(), edge_index[:, 1].contiguous()
+
 
 def random_graph(p, k=1000):
-    pos = torch.rand(3, k) * 2 -1
-    edge_index = torch.full((k,k), p).bernoulli().non_zero().long()
-    return pos, edge_index[:,0].contiguous(), edge_index[:,1].contiguous()
+    pos = torch.rand(3, k) * 2 - 1
+    edge_index = torch.full((k, k), p).bernoulli().non_zero().long()
+    return pos, edge_index[:, 0].contiguous(), edge_index[:, 1].contiguous()

@@ -93,3 +93,29 @@ class WindSeqDataset(data.Dataset):
         m = self.means.to(device)
 
         return y * s[4:] + m[4:]
+
+
+class AdaptDataset(data.Dataset):
+    def __init__(self, dataset):
+        self.dataset = dataset
+
+    def __getitem__(self, i):
+        (cx, cy), (tx, ty) = self.dataset[i]
+        return (cx[:, :3], cy, tx[:, :3]), ty
+
+    def __len__(self):
+        return len(self.dataset)
+
+
+def datasets(path):
+    from .windspeed import Week0, Week1, Week2, Week4
+
+    weeks = [Week0(path), Week1(path), Week2(path), Week4(path)]
+    val_full_dataset = Week0(path, stage="val")
+
+    train_dataset = AdaptDataset(
+        CombineSequentialDataset([WindSeqDataset(w, 1 * 60, 30 * 60, 1) for w in weeks])
+    )
+    val_dataset = AdaptDataset(WindSeqDataset(val_full_dataset, 1 * 60, 30 * 60, 1))
+
+    return train_dataset, val_dataset

@@ -1,13 +1,13 @@
 import os
 
+import matplotlib.pyplot as plt
 import torch.nn as nn
-import wandb
 from dotenv import load_dotenv
 from torch.utils.data import DataLoader
-from windgraph import GEN, GraphStructure
-from windgraph.datasets import FourWeeksDataset
+from windgraph.datasets import datasets
 from windgraph.experiment import run_exp
-from windgraph.graphs import kmeans_from_dataset, neighbors_edges
+from windgraph.gen import GEN, GENwoenc
+from windgraph.graphs import GraphStructure, kmeans_from_dataset, neighbors_edges
 from windgraph.mlp import MLP
 from windgraph.positional_encoding import SinCosPositionalEncoding
 
@@ -15,23 +15,29 @@ N = 1000
 
 if __name__ == "__main__":
     load_dotenv()
-    path = os.getenv("ROOT_FOLDER")    
+    train_dataset, val_dataset = datasets(os.getenv("ROOT_FOLDER"))
 
-    dataset = FourWeeksDataset(path, stage="train")
-    val_dataset = FourWeeksDataset(path, stage="val")
+    kmeans_pos = kmeans_from_dataset(train_dataset, N)
+    gs = GraphStructure(kmeans_pos, *neighbors_edges(kmeans_pos, 3), fixed=True)
 
-    kmeans_pos = kmeans_from_dataset(dataset, N)
-    gs = GraphStructure(kmeans_pos, *neighbors_edges(kmeans_pos, 3)),
-    model = GEN(gs, 4,2, 32, 2, 7)
+    model = GENwoenc(gs, 3, 2, 32, 2, 7)
 
-    encoders = [
-        nn.Identity(),
-        None,
-        SinCosPositionalEncoding(1/10000.0, 32),
-        nn.Sequential(SinCosPositionalEncoding(1/10000.0, 32), MLP(32,32,32,2))
-    ]
+    train_dl = DataLoader(train_dataset, batch_size=1, shuffle=True)
+    val_dl = DataLoader(val_dataset, batch_size=1, shuffle=True)
 
-    train_dl = DataLoader(dataset, batch_size=12, shuffle=True)
-    val_dl = DataLoader(val_dataset, batch_size=12, shuffle=True)
+    model, name = run_exp(model, train_dl, val_dl)
 
-    model, name = run_exp(model, train_dl)
+    plt.figure()
+    fig, axs = plt.subplots(5, 3, figsize=(6, 10))
+
+    (cxs, cys, txs), targets = next(iter(val_dl))
+    outputs = model(cxs.cuda(), cys.cuda(), txs.cuda()).cpu()
+
+    for ax, cy, target, output in zip(axs, cys, targets, outputs):
+        ax[1].imshow(cy.view(14, 28).int(), cmap="Greys_r")
+        ax[1].set_xlim([0, 26])
+        ax[1].set_ylim([26, 0])
+        ax[0].imshow(target.view(28, 28).int(), cmap="Greys_r")
+        ax[2].imshow(output.view(28, 28).int(), cmap="Greys_r")
+    fig.subplots_adjust(wspace=0.1, hspace=0.2, left=0.1, right=1.0)
+    fig.savefig(name + ".pdf")
