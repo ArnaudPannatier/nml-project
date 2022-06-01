@@ -1,4 +1,8 @@
 name: windgraph
+channels:
+  - pytorch
+  - defaults
+  - conda-forge
 dependencies:
   - python=3.9
   - pytorch::pytorch=1.10
@@ -7,8 +11,10 @@ dependencies:
   - black
   - tqdm
   - pyyaml
-  - hyp5
   - matplotlib
   - networkx
   - streamlit
   - wandb
+  - python-dotenv
+  - pandas
+  - pyyaml
