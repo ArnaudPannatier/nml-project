@@ -1,5 +1,6 @@
 import argparse
 import datetime
+from itertools import islice
 from pathlib import Path
 
 import torch
@@ -23,6 +24,13 @@ def run_exp(
     )
     parser.add_argument(
         "--learning_rate", "-lr", type=float, default=1e-3, help="learning rate"
+    )
+    parser.add_argument(
+        "--slice",
+        "-sl",
+        type=int,
+        default=None,
+        help="Slice training",
     )
     parser.add_argument("--config", "-c", type=str)
     args = parser.parse_args()
@@ -65,7 +73,13 @@ def run_exp(
         nb_train_samples, acc_train_loss = 0, 0.0
 
         model.train()
-        for (cx, cy, tx), targets in (pbar := tqdm(train_dl)):
+
+        if args.slice:
+            pbar = tqdm(islice(iter(train_dl), args.slice), total=args.slice)
+        else:
+            pbar = tqdm(train_dl)
+
+        for (cx, cy, tx), targets in pbar:
             cx = cx.to(device)
             cy = cy.to(device)
             tx = tx.to(device)

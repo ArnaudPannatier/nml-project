@@ -81,6 +81,10 @@ class BaseDataset(MalatDataset):
         return self._fid_dicts
 
 
+class FourWeeksDataset(BaseDataset):
+    stage_index = {"train": Weeks([0, 1, 2, 4]), "test": Day(4, 2), "val": Day(3, 3)}
+
+
 class Week0(BaseDataset):
     stage_index = {"train": Week(0), "test": Day(4, 2), "val": Day(3, 3)}
 

@@ -40,7 +40,7 @@ class GraphStructure(nn.Module):
         pos = self.pos.detach().cpu().numpy()
         g = nx.Graph()
         g.add_edges_from(edges)
-        return g, dict(enumerate(pos))
+        return g, dict(enumerate(pos[:, :2]))
 
 
 def grid(n):

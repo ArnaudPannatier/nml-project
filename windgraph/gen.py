@@ -10,12 +10,10 @@ from .mlp import MLP
 class GraphNetBlock(nn.Module):
     def __init__(self, in_dim=128, dim=128, l=2):
         super().__init__()
-        self.message = MLP(2 * in_dim, dim, in_dim, l)
-        self.node = MLP(2 * in_dim, dim, in_dim, l)
+        self.message = MLP(2 * in_dim, in_dim, dim, l)
+        self.node = MLP(2 * in_dim, in_dim, dim, l)
 
     def forward(self, nodes, senders, receivers):
-        print(senders)
-        print(receivers)
         messages = self.message(
             torch.cat((nodes[:, receivers], nodes[:, senders]), dim=-1)
         )
@@ -86,19 +84,22 @@ class GENwoenc(nn.Module):
         self.g = graph_structure
         if share_blocks:
             self.gn_blocks = nn.ModuleList(
-                [GraphNetBlock(dim_h, nlayers)] * message_passing_steps
+                [GraphNetBlock(dim_x + dim_y, dim_h, nlayers)] * message_passing_steps
             )
         else:
             self.gn_blocks = nn.ModuleList(
-                [GraphNetBlock(dim_h, nlayers) for _ in range(message_passing_steps)]
+                [
+                    GraphNetBlock(dim_x + dim_y, dim_h, nlayers)
+                    for _ in range(message_passing_steps)
+                ]
             )
-        self.decoder = MLP(dim_h + dim_x, dim_y, dim_h, nlayers)
+        self.decoder = MLP(2 * dim_x + dim_y, dim_y, dim_h, nlayers)
 
     def forward(self, x, s, q):
         # (B, C, N)
         scores = self.g(x)
         # (B, C, D)
-        latents = scores.transpose(1, 2).bmm(s)
+        latents = scores.transpose(1, 2).bmm(torch.cat((x, s), dim=-1))
         for block in self.gn_blocks:
             # (B, N, D)
             latents = block(latents, self.g.senders, self.g.receivers)
