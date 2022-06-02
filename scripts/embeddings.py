@@ -1,4 +1,5 @@
 import os
+from argparse import ArgumentParser
 
 import matplotlib.pyplot as plt
 import networkx as nx
@@ -7,27 +8,39 @@ import torch.nn as nn
 from dotenv import load_dotenv
 from torch.utils.data import DataLoader
 from windgraph.datasets import datasets
-from windgraph.experiment import run_exp
+from windgraph.experiment import add_exp_args, run_exp
 from windgraph.gen import GEN, GENwoenc
 from windgraph.graphs import GraphStructure, kmeans_from_dataset, neighbors_edges
 from windgraph.mlp import MLP
 from windgraph.positional_encoding import SinCosPositionalEncoding
 
 N = 20
+k = 3
 
 if __name__ == "__main__":
     load_dotenv()
     train_dataset, val_dataset = datasets(os.getenv("ROOT_FOLDER"))
 
+    parser = ArgumentParser(description="Windspeed Pipeline")
+    add_exp_args(parser)
+
+    parser.add_argument(
+        "--embedding", "-emb", choices=["noemb", "sincos"], default="noemb"
+    )
+
+    args = parser.parse_args()
+    if not args.name:
+        args.name = f"kmeans-{N}N-{k=}-{args.embedding}"
+
     kmeans_pos = kmeans_from_dataset(train_dataset, N)
-    gs = GraphStructure(kmeans_pos, *neighbors_edges(kmeans_pos, 3), fixed=True)
+    gs = GraphStructure(kmeans_pos, *neighbors_edges(kmeans_pos, k), fixed=True)
 
     model = GENwoenc(gs, 3, 2, 32, 2, 3)
 
     train_dl = DataLoader(train_dataset, batch_size=1, shuffle=True)
     val_dl = DataLoader(val_dataset, batch_size=1, shuffle=True)
 
-    model, name = run_exp(model, train_dl, val_dl)
+    model = run_exp(model, train_dl, val_dl, args)
 
     plt.figure()
     fig, axs = plt.subplots(3, 6, figsize=(15, 8))
@@ -70,4 +83,4 @@ if __name__ == "__main__":
             a.set_xlim(xlim)
             a.set_ylim(ylim)
 
-    fig.savefig(name + ".pdf")
+    fig.savefig(f"results/{args.name}.pdf")
