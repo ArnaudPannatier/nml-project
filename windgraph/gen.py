@@ -96,18 +96,11 @@ class GENwoenc(nn.Module):
         self.decoder = MLP(2 * dim_x + dim_y, dim_y, dim_h, nlayers)
 
     def forward(self, x, s, q):
-        # (B, C, N)
         scores = self.g(x)
-        # (B, C, D)
         latents = scores.transpose(1, 2).bmm(torch.cat((x, s), dim=-1))
         for block in self.gn_blocks:
-            # (B, N, D)
             latents = block(latents, self.g.senders, self.g.receivers)
 
-        # (B, T, N)
         scores = self.g(q)
-        # (B, T, D)
         z = scores.bmm(latents)
-        # Decoder uses q as well (not in the paper but in their code.)
-        # So it really is a CNP with
         return self.decoder(torch.cat((z, q), dim=-1))

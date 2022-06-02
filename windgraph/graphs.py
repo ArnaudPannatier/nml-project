@@ -92,11 +92,11 @@ def neighbors_edges(pos, n=3):
 
 def ba_edges(pos, m=3):
     g = nx.barabasi_albert_graph(len(pos), m)
-    edge_index = torch.tensor(g.edges()).long()
+    edge_index = torch.tensor(np.array(g.edges())).long()
     return edge_index[:, 0].contiguous(), edge_index[:, 1].contiguous()
 
 
 def random_graph(p, k=1000):
-    pos = torch.rand(3, k) * 2 - 1
-    edge_index = torch.full((k, k), p).bernoulli().non_zero().long()
+    pos = torch.rand(k, 3) * 2 - 1
+    edge_index = torch.full((k, k), p).bernoulli().nonzero()
     return pos, edge_index[:, 0].contiguous(), edge_index[:, 1].contiguous()

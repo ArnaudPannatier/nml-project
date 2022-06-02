@@ -54,7 +54,7 @@ if __name__ == "__main__":
         scores = model.g(cx.cuda())
         latents = scores.transpose(1, 2).bmm(torch.cat((cx.cuda(), cy.cuda()), dim=-1))
 
-        for block, a in zip(model.gn_blocks, ax[3:5]):
+        for block, a in zip(model.gn_blocks, ax[2:5]):
             latents = block(latents, model.g.senders, model.g.receivers)
             quiver_plot(latents, model, a)
 
