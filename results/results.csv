@@ -1,2 +1,1 @@
-time,epoch,model,train,val
-2022-06-02 22:34,kmeans-20N-k=3-noemb,0.2357,0.6761
+2022-06-02 23:18,kmeans-20N-k=3-noemb,29.18%,67.56%
