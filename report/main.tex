@@ -10,7 +10,8 @@
 \symmetricmargins                 % uncomment for equal margins
 \unitname{EDIC}{Idiap Research Institute}{Machine Learning Group}
 \course{EE-452}{Network Machine Learning}
-  
+\usepackage{booktabs}       % professional-quality tables
+
 
 \newcommand{\ap}[1]{\marginpar{{\tiny \color{red} [AP] #1}}}
 \begin{document}
@@ -98,6 +99,26 @@ A contribution of this work is to add edge features to GENs. We think that a goo
 % If you plan to use graph neural networks to solve a task, remember that extensive cross validation of the architecture is expensive and may not be very informative. It it therefore important to spend time beforehand to understand what architecture should work well: what aggregation function is the most relevant for this data? What matters most: the graph structure itself, the node features, the edge features?
 
 Here the node features is the most informative, maybe the edge features depending on the exploration of 1.
+
+\subsection{Graph Types}
+
+\begin{table*}
+  \label{tab:results}
+  \centering
+  \begin{tabular}{lccc} \toprule
+    \textbf{Model} & \multicolumn{3}{c}{\textbf{Nodes}} \\ \cmidrule(lr){2-4}
+     & 10 & 100 & 1000               \\ \hline
+     \textbf{Random Network, $p=10\%$}                  & XX $\pm$ XX            & XX  $\pm$ XX & XX $\pm$ XX             \\
+     \textbf{Random Network, $p=10\%$}                  & XX $\pm$ XX            & XX  $\pm$ XX & XX $\pm$ XX             \\
+     \textbf{K-Means, 3 nn.}                  & XX $\pm$ XX            & XX  $\pm$ XX & XX $\pm$ XX             \\
+    \textbf{K-Means, BA}                  & XX $\pm$ XX            & XX  $\pm$ XX & XX $\pm$ XX             \\
+
+    \bottomrule
+  \end{tabular}
+  \caption{
+    Graph Types results
+  }
+\end{table*}
 
 % You can also consider simple baselines such as logisitic regression on preprocessed features. Such baselines are often quite strong, and can give a good idea of the performance of your graph network.
 
