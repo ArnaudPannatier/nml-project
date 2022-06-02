@@ -86,7 +86,7 @@ def kmeans_from_dataset(dataset, k=1000, path=Path("kmeans.pt")):
 def neighbors_edges(pos, n=3):
     dists = torch.norm(pos[None, :, :] - pos[:, None, :], dim=2)
     receivers = dists.argsort()[:, 1 : n + 1].flatten()
-    senders = torch.arange(len(pos)).repeat(n)
+    senders = torch.arange(len(pos)).repeat_interleave(n)
     return senders, receivers
 
 
