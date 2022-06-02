@@ -1,5 +1,6 @@
 import os
 from argparse import ArgumentParser
+from pathlib import Path
 
 import matplotlib.pyplot as plt
 import networkx as nx
@@ -16,6 +17,8 @@ from windgraph.positional_encoding import SinCosPositionalEncoding
 
 N = 20
 k = 3
+
+rel_path = Path(__file__).parent
 
 if __name__ == "__main__":
     load_dotenv()
@@ -83,4 +86,4 @@ if __name__ == "__main__":
             a.set_xlim(xlim)
             a.set_ylim(ylim)
 
-    fig.savefig(f"results/{args.name}.pdf")
+    fig.savefig(rel_path / f"results/{args.name}.pdf")

@@ -1,4 +1,6 @@
 import os
+from argparse import ArgumentParser
+from pathlib import Path
 
 import matplotlib.pyplot as plt
 import networkx as nx
@@ -6,8 +8,8 @@ import torch
 from dotenv import load_dotenv
 from torch.utils.data import DataLoader
 from windgraph.datasets import datasets
-from windgraph.experiment import run_exp
-from windgraph.gen import GEN, GENwoenc
+from windgraph.experiment import add_exp_args, run_exp
+from windgraph.gen import GENwoenc
 from windgraph.graphs import (
     GraphStructure,
     ba_edges,
@@ -16,25 +18,36 @@ from windgraph.graphs import (
     random_graph,
 )
 
+rel_path = Path(__file__).parent
+
 N = 20
 
 if __name__ == "__main__":
     load_dotenv()
+    parser = ArgumentParser(description="Windspeed Pipeline")
+    add_exp_args(parser)
+
+    parser.add_argument("--graph", "-g", choices=["nn", "rn", "ba"], default="nn")
+
+    args = parser.parse_args()
+    if not args.name:
+        args.name = f"{args.graph}-{N}N-noemb"
+
     train_dataset, val_dataset = datasets(os.getenv("ROOT_FOLDER"))
 
     kmeans_pos = kmeans_from_dataset(train_dataset, N)
-    graph_structures = [
-        GraphStructure(kmeans_pos, *neighbors_edges(kmeans_pos, 3), fixed=True),
-        GraphStructure(*random_graph(0.1, N), fixed=True),
-        GraphStructure(kmeans_pos, *ba_edges(kmeans_pos), fixed=True),
-    ]
+    graph_structures = {
+        "nn": GraphStructure(kmeans_pos, *neighbors_edges(kmeans_pos, 3), fixed=True),
+        "rn": GraphStructure(*random_graph(0.1, N), fixed=True),
+        "ba": GraphStructure(kmeans_pos, *ba_edges(kmeans_pos), fixed=True),
+    }
 
-    model = GENwoenc(graph_structures[1], 3, 2, 32, 2, 3)
+    model = GENwoenc(graph_structures[args.graph], 3, 2, 32, 2, 3)
 
     train_dl = DataLoader(train_dataset, batch_size=1, shuffle=True)
     val_dl = DataLoader(val_dataset, batch_size=1, shuffle=True)
 
-    model, name = run_exp(model, train_dl, val_dl)
+    model, name = run_exp(model, train_dl, val_dl, args)
 
     plt.figure()
     fig, axs = plt.subplots(3, 6, figsize=(15, 8))
@@ -77,4 +90,4 @@ if __name__ == "__main__":
             a.set_xlim(xlim)
             a.set_ylim(ylim)
 
-    fig.savefig("random-p0.1.pdf")
+    fig.savefig(rel_path / f"results/{args.name}.pdf")

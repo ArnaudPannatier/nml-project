@@ -1,0 +1,6 @@
+LICENSE
+setup.py
+windgraph.egg-info/PKG-INFO
+windgraph.egg-info/SOURCES.txt
+windgraph.egg-info/dependency_links.txt
+windgraph.egg-info/top_level.txt

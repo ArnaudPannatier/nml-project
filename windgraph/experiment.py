@@ -7,6 +7,8 @@ import torch
 import torch.nn as nn
 from tqdm import tqdm
 
+rel_path = Path(__file__).parent.parent
+
 
 def add_exp_args(parser):
     parser.add_argument("--cuda", type=bool, default=torch.cuda.is_available())
@@ -33,7 +35,7 @@ def run_exp(
     now = datetime.datetime.now()
     Path("logs").mkdir(exist_ok=True)
     name = f"logs/{args.name}-{now:%Y-%m-%d-%H:%M}"
-    log_file = open(name + ".log", "w+", 1)
+    log_file = open(rel_path / (name + ".log"), "w+", 1)
     nb_parameters = sum(p.numel() for p in model.parameters())
 
     for p in model.parameters():
@@ -104,8 +106,8 @@ def run_exp(
         log_file.write(f"Val: {e+1} {acc_val_loss / nb_val_samples}\n")
         if acc_val_loss < min_val_loss:
             min_val_loss = acc_val_loss
-            torch.save(model.state_dict(), f"results/{args.name}.ckpt")
-            with open("results/results.csv", "w", newline="") as file:
+            torch.save(model.state_dict(), rel_path / f"results/{args.name}.ckpt")
+            with open(rel_path / "results/results.csv", "w", newline="") as file:
                 writer = csv.writer(file)
                 writer.writerow(
                     [

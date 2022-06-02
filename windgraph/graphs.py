@@ -68,7 +68,7 @@ def grid(n):
     return pos, senders, receivers
 
 
-def kmeans_from_dataset(dataset, k=1000, path=Path("kmeans.pt")):
+def kmeans_from_dataset(dataset, k=1000, path=Path(__file__).parent / "kmeans.pt"):
     if path.exists():
         return torch.load(path)
 
