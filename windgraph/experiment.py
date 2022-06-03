@@ -23,7 +23,6 @@ def add_exp_args(parser):
 def run_exp(
     model, train_dl, val_dl, args, criterion=nn.MSELoss(), optimizer=torch.optim.Adam
 ):
-    device_dict = {}
     if args.seed >= 0:
         torch.manual_seed(args.seed)
     if args.cuda:
@@ -107,15 +106,15 @@ def run_exp(
         if acc_val_loss < min_val_loss:
             min_val_loss = acc_val_loss
             torch.save(model.state_dict(), rel_path / f"results/{args.name}.ckpt")
-            with open(rel_path / "results/results.csv", "w", newline="") as file:
+            with open(rel_path / "results/results.csv", "a", newline="") as file:
                 writer = csv.writer(file)
                 writer.writerow(
                     [
                         f"{datetime.datetime.now():%Y-%m-%d %H:%M}",
                         e,
                         args.name,
-                        f"{acc_train_loss / nb_train_samples:.2%}",
-                        f"{acc_val_loss / nb_val_samples:.2%}",
+                        f"{acc_train_loss / nb_train_samples:.2f}",
+                        f"{acc_val_loss / nb_val_samples:.2f}",
                     ]
                 )
 

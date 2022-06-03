@@ -18,7 +18,7 @@ from windgraph.positional_encoding import SinCosPositionalEncoding
 N = 20
 k = 3
 
-rel_path = Path(__file__).parent
+rel_path = Path(__file__).parent.parent
 
 if __name__ == "__main__":
     load_dotenv()

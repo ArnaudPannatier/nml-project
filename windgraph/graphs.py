@@ -1,3 +1,4 @@
+import os
 from pathlib import Path
 
 import networkx as nx
@@ -5,7 +6,12 @@ import numpy as np
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+from dotenv import load_dotenv
 from sklearn.cluster import KMeans
+
+from windgraph.datasets.windspeed import FourWeeksDataset
+
+load_dotenv()
 
 
 class GraphStructure(nn.Module):
@@ -68,9 +74,16 @@ def grid(n):
     return pos, senders, receivers
 
 
-def kmeans_from_dataset(dataset, k=1000, path=Path(__file__).parent / "kmeans.pt"):
+def kmeans_from_dataset(
+    dataset=FourWeeksDataset(os.getenv("ROOT_FOLDER")),
+    k=1000,
+    path=Path(__file__).parent / "kmeans.pt",
+):
+    kdict = {}
     if path.exists():
-        return torch.load(path)
+        kdict = torch.load(path)
+        if k in kdict:
+            return kdict[k]
 
     choices = torch.randperm(len(dataset))[:100000]
     inputs, _ = dataset[choices]
@@ -79,7 +92,8 @@ def kmeans_from_dataset(dataset, k=1000, path=Path(__file__).parent / "kmeans.pt
     print(inputs.shape)
     kmeans = KMeans(n_clusters=k, verbose=3).fit(inputs)
     pos = torch.tensor(kmeans.cluster_centers_).float()
-    torch.save(pos, path)
+    kdict[k] = pos
+    torch.save(kdict, path)
     return pos
 
 
