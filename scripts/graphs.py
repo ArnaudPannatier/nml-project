@@ -25,19 +25,22 @@ if __name__ == "__main__":
     parser = ArgumentParser(description="Windspeed Pipeline")
     add_exp_args(parser)
 
-    parser.add_argument("--graph", "-g", choices=["nn", "rn", "ba"], default="nn")
+    parser.add_argument(
+        "--graph", "-g", choices=["nn", "rn1", "rn10", "ba"], default="nn"
+    )
     parser.add_argument("--nodes", "-n", type=int, default=20)
 
     args = parser.parse_args()
     if not args.name:
-        args.name = f"{args.graph}-{args.nodes}N-noemb"
+        args.name = f"{args.graph}-{args.nodes}N-noemb{args.seed}"
 
     train_dataset, val_dataset = datasets(os.getenv("ROOT_FOLDER"))
 
     kmeans_pos = kmeans_from_dataset(k=args.nodes)
     graph_structures = {
         "nn": GraphStructure(kmeans_pos, *neighbors_edges(kmeans_pos, 3), fixed=True),
-        "rn": GraphStructure(*random_graph(0.1, args.nodes), fixed=True),
+        "rn1": GraphStructure(*random_graph(0.01, args.nodes), fixed=True),
+        "rn10": GraphStructure(*random_graph(0.1, args.nodes), fixed=True),
         "ba": GraphStructure(kmeans_pos, *ba_edges(kmeans_pos), fixed=True),
     }
 

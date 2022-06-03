@@ -110,9 +110,10 @@ def run_exp(
                 writer = csv.writer(file)
                 writer.writerow(
                     [
+                        args.name,
+                        args.seed,
                         f"{datetime.datetime.now():%Y-%m-%d %H:%M}",
                         e,
-                        args.name,
                         f"{acc_train_loss / nb_train_samples:.2f}",
                         f"{acc_val_loss / nb_val_samples:.2f}",
                     ]
