@@ -126,6 +126,26 @@ Here the node features is the most informative, maybe the edge features dependin
   }
 \end{table*}
 
+\subsection{Nodes features}
+
+\begin{table*}
+  \label{tab:results}
+  \centering
+  \begin{tabular}{lccc} \toprule
+    \textbf{Model}                    & \multicolumn{3}{c}{\textbf{Nodes}}                                                           \\ \cmidrule(lr){2-4}
+                                      & 10                                 & 100                    & 1000                           \\ \hline
+    \textbf{Random Network, $p=1\%$}  & 0.80  \tiny $\pm$ 0.04             & 0.71  \tiny $\pm$ 0.02 & 0.70 \tiny $\pm$ 0.02          \\
+    \textbf{Random Network, $p=10\%$} & 0.76  \tiny $\pm$ 0.03             & 0.70  \tiny $\pm$ 0.02 & 0.76 \tiny $\pm$ 0.02          \\
+    \textbf{K-Means, 3 nn.}           & 0.68  \tiny $\pm$ 0.01             & 0.69  \tiny $\pm$ 0.02 & 0.68 \tiny $\pm$ 0.01          \\
+    \textbf{K-Means, BA}              & 0.69  \tiny $\pm$ 0.01             & 0.68  \tiny $\pm$ 0.01 & \textbf{0.66 \tiny $\pm$ 0.02} \\
+
+    \bottomrule
+  \end{tabular}
+  \caption{
+    Graph Types results
+  }
+\end{table*}
+
 % You can also consider simple baselines such as logisitic regression on preprocessed features. Such baselines are often quite strong, and can give a good idea of the performance of your graph network.
 
 Have a good baseline.

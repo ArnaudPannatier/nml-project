@@ -38,10 +38,10 @@ if __name__ == "__main__":
 
     kmeans_pos = kmeans_from_dataset(k=args.nodes)
     graph_structures = {
-        "nn": GraphStructure(kmeans_pos, *neighbors_edges(kmeans_pos, 3), fixed=True),
-        "rn1": GraphStructure(*random_graph(0.01, args.nodes), fixed=True),
-        "rn10": GraphStructure(*random_graph(0.1, args.nodes), fixed=True),
-        "ba": GraphStructure(kmeans_pos, *ba_edges(kmeans_pos), fixed=True),
+        "nn": GraphStructure(kmeans_pos, *neighbors_edges(kmeans_pos, 3), fixed=False),
+        "rn1": GraphStructure(*random_graph(0.01, args.nodes), fixed=False),
+        "rn10": GraphStructure(*random_graph(0.1, args.nodes), fixed=False),
+        "ba": GraphStructure(kmeans_pos, *ba_edges(kmeans_pos), fixed=False),
     }
 
     model = GENwoenc(graph_structures[args.graph], 3, 2, 32, 2, 3)
