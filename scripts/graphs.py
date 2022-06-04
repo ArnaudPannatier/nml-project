@@ -28,7 +28,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--graph", "-g", choices=["nn", "rn1", "rn10", "ba"], default="nn"
     )
-    parser.add_argument("--nodes", "-n", type=int, default=20)
+    parser.add_argument("--nodes", type=int, default=20)
 
     args = parser.parse_args()
     if not args.name:
