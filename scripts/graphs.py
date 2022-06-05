@@ -56,7 +56,7 @@ if __name__ == "__main__":
 
     def quiver_plot(lats, model, ax):
         lats = lats.detach().cpu()
-        p = model.g.pos.cpu()
+        p = model.g.pos.detach().cpu()
         ax.plot(p[:, 0], p[:, 1], ".")
         ax.quiver(
             p[:, 0],

@@ -35,3 +35,21 @@ class SinCosPositionalEncoding(nn.Module):
         pe = torch.cos(two_pi * self.fs * x[..., None] + self.phase)
         scale = sqrt(1 / (2 * len(self.fs)))
         return pe * scale
+
+
+class PosEncCat(nn.Module):
+    def __init__(self, n):
+        super().__init__()
+        self.pe = SinCosPositionalEncoding(n)
+
+    def forward(self, x):
+        return self.pe(x).view(x.size(0), x.size(1), -1)
+
+
+class PosEncAdd(nn.Module):
+    def __init__(self, n):
+        super().__init__()
+        self.pe = SinCosPositionalEncoding(n)
+
+    def forward(self, x):
+        return self.pe(x).sum(2)

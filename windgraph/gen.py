@@ -26,17 +26,16 @@ class GEN(nn.Module):
         dim_x,
         dim_y,
         dim_h,
+        dim_out,
         nlayers,
         message_passing_steps,
         share_blocks=False,
-        custom_encoder=None,
+        pe=None,
     ):
         super().__init__()
         self.g = graph_structure
-        if custom_encoder:
-            self.encoder = custom_encoder
-        else:
-            self.encoder = MLP(dim_x + dim_y, dim_h, dim_h, nlayers)
+        self.pe = pe
+        self.encoder = MLP(dim_x + dim_y, dim_h, dim_h, nlayers)
         if share_blocks:
             self.gn_blocks = nn.ModuleList(
                 [GraphNetBlock(dim_h, dim_h, nlayers)] * message_passing_steps
@@ -48,13 +47,17 @@ class GEN(nn.Module):
                     for _ in range(message_passing_steps)
                 ]
             )
-        self.decoder = MLP(dim_h + dim_x, dim_y, dim_h, nlayers)
+        self.decoder = MLP(dim_h + dim_x, dim_out, dim_h, nlayers)
 
     def forward(self, x, s, q):
         # (B, C, N)
         scores = self.g(x)
         # (B, C, D)
-        emb = self.encoder(s)
+        if self.pe:
+            c = torch.cat((self.pe(x), self.pe(s)), dim=-1)
+        else:
+            c = torch.cat((x, s), dim=-1)
+        emb = self.encoder(c)
         # (B, N, D)
         latents = scores.transpose(1, 2).bmm(emb)
         for block in self.gn_blocks:
@@ -67,6 +70,8 @@ class GEN(nn.Module):
         z = scores.bmm(latents)
         # Decoder uses q as well (not in the paper but in their code.)
         # So it really is a CNP with
+        if self.pe:
+            q = self.pe(q)
         return self.decoder(torch.cat((z, q), dim=-1))
 
 

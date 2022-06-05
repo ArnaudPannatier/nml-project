@@ -18,6 +18,7 @@ def add_exp_args(parser):
     parser.add_argument("--slice", "-sl", type=int)
     parser.add_argument("--name", type=str)
     parser.add_argument("--config", "-c", type=str)
+    parser.add_argument("--verbose", "-v", action="store_true")
 
 
 def run_exp(
@@ -37,10 +38,11 @@ def run_exp(
     log_file = open(rel_path / (name + ".log"), "w+", 1)
     nb_parameters = sum(p.numel() for p in model.parameters())
 
-    for p in model.parameters():
-        print(p.shape, p.numel())
+    if args.verbose:
+        for p in model.parameters():
+            print(p.shape, p.numel())
 
-    print(nb_parameters)
+        print(nb_parameters)
 
     log_file.write(str(model) + "\n\n")
     log_file.write(f"nb_parameters {nb_parameters}\n")
