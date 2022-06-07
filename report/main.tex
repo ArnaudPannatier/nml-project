@@ -63,7 +63,7 @@ In order to predict a value at a new query position, the model linearly extrapol
 \begin{figure}[htbp]
   \centering
   \includegraphics[width=\textwidth]{figs/GEN}
-  \caption{GEN architecture. The measures are first encoded to a latent space, then the initial node feature is computed by aggregate the closer encoded measures, processing is done by message passing and the final measures are retrieved by first interpolating the nodes features at the query position and then decoding.}
+  \caption{GEN architecture \cite{alet2019gen}. The measures are first encoded to a latent space, then the initial node feature is computed by aggregate the closer encoded measures, processing is done by message passing and the final measures are retrieved by first interpolating the nodes features at the query position and then decoding.}
 \end{figure}
 
 \ap{advantages -- drawbacks}
@@ -101,7 +101,7 @@ For the last graph structure, we will use a Barab\'asi-Albert model scheme for g
 
 \subsection{Features}
 
-In this work we will focus on nodes and edges features as we are using the graph network to do regression over the whole space. We won't need to aggregate the features over the whole graph.
+In this work, we will focus on nodes and edges features as we are using the graph network to do regression over the whole space. We won't need to aggregate the features over the whole graph.
 
 
 \subsection{Nodes features}
@@ -131,7 +131,7 @@ Euler equation:
 
 \subsection{Graph Types}
 
-The foud different graphs that we tried are depicted in Figure \ref{fig:graphs}. The first row show that case were the nodes are fixed during training and the second row contains graph were the node position is optimized during training with gradient descent.
+The four different graphs that we tried are depicted in Figure \ref{fig:graphs}. The first-row show the case where the nodes are fixed during training and the second row contains graph were the node position is optimized during training with gradient descent.
 The performance of the different graph types are displayed in Table \ref{tab:graphs}.
 We see that allowing position to move during training (\textsc{Adapt} in the table) are always performing better than their fixed counterpart. Random Graphs are the baseline and we expect them to perform poorly as they are initialized randomly without taking into account additional insight that we can have about the dataset. We see that indeed their performance is worse than the other models.
 
@@ -139,45 +139,45 @@ We see that allowing position to move during training (\textsc{Adapt} in the tab
 \begin{figure}[htbp]
   \begin{subfigure}{0.24\textwidth}
     \centering
-    \includegraphics[trim={0 13.2cm 29.35cm 0},clip,width=\textwidth]{../results/rn1-100N-noemb-fixed}
+    \includegraphics[trim={0 13.2cm 29.35cm 0},clip,width=\textwidth]{../results/pdfs/rn1-100N-noemb-fixed}
     \caption{Random network with $p=1\%$}
   \end{subfigure}
   \begin{subfigure}{0.24\textwidth}
     \centering
-    \includegraphics[trim={0 13.2cm 29.35cm 0},clip,width=\textwidth]{../results/rn10-100N-noemb-fixed}
+    \includegraphics[trim={0 13.2cm 29.35cm 0},clip,width=\textwidth]{../results/pdfs/rn10-100N-noemb-fixed}
     \caption{Random network with $p=10\%$}
   \end{subfigure}
   \begin{subfigure}{0.24\textwidth}
     \centering
-    \includegraphics[trim={0 13.2cm 29.35cm 0},clip,width=\textwidth]{../results/nn-100N-noemb-fixed}
+    \includegraphics[trim={0 13.2cm 29.35cm 0},clip,width=\textwidth]{../results/pdfs/nn-100N-noemb-fixed}
     \caption{$k$-means, 3nn}
   \end{subfigure}
   \begin{subfigure}{0.24\textwidth}
     \centering
-    \includegraphics[trim={0 13.2cm 29cm 0},clip,width=\textwidth]{../results/ba-100N-noemb-fixed}
+    \includegraphics[trim={0 13.2cm 29cm 0},clip,width=\textwidth]{../results/pdfs/ba-100N-noemb-fixed}
     \caption{$k$-means, BA}
   \end{subfigure}
   \begin{subfigure}{0.24\textwidth}
     \centering
-    \includegraphics[trim={0 13.2cm 29cm 0},clip,width=\textwidth]{../results/rn1-100N-noemb0}
+    \includegraphics[trim={0 13.2cm 29cm 0},clip,width=\textwidth]{../results/pdfs/rn1-100N-noemb0}
     \caption{Random network with $p=1\%$}
   \end{subfigure}
   \begin{subfigure}{0.24\textwidth}
     \centering
-    \includegraphics[trim={0 13.2cm 29cm 0},clip,width=\textwidth]{../results/rn10-100N-noemb0}
+    \includegraphics[trim={0 13.2cm 29cm 0},clip,width=\textwidth]{../results/pdfs/rn10-100N-noemb0}
     \caption{Random network with $p=10\%$}
   \end{subfigure}
   \begin{subfigure}{0.24\textwidth}
     \centering
-    \includegraphics[trim={0 13.2cm 29cm 0},clip,width=\textwidth]{../results/nn-100N-noemb0}
+    \includegraphics[trim={0 13.2cm 29cm 0},clip,width=\textwidth]{../results/pdfs/nn-100N-noemb0}
     \caption{$k$-means, 3nn}
   \end{subfigure}
   \begin{subfigure}{0.24\textwidth}
     \centering
-    \includegraphics[trim={0 13.2cm 29cm 0},clip,width=\textwidth]{../results/ba-100N-noemb0}
+    \includegraphics[trim={0 13.2cm 29cm 0},clip,width=\textwidth]{../results/pdfs/ba-100N-noemb0}
     \caption{$k$-means, BA}
   \end{subfigure}
-  \caption{Graph structure for the different models. The first row show graphs where each node has a fixed position, in the second row we see how this position has evolved during training.}
+  \caption{Graph structure for the different models. The first row (a-d) show graphs where each node has a fixed position, in the second row (e-h) we see how this position has evolved during training.}
   \label{fig:graphs}
 \end{figure}
 
@@ -198,7 +198,7 @@ We see that allowing position to move during training (\textsc{Adapt} in the tab
     \bottomrule
   \end{tabular}
   \caption{
-    We tried different graph topology for our model that use no embeddings. First, as a baseline, we tried Random Networks, were the position of each nodes is drawn from $\mathcal{U}(-1,1)$ and where there is an edge between two nodes with probability $p$. Then we tried to use $k$-means to get the position of the nodes and added edges either between the 3 nearest neighbors in the graph or following a Barabasi-Albert procedure. The results are the MSE error on the validation set, we ran ten different seeds to get the standard deviation. all measures are normalized.
+    We tried different graph topology for our model that use no embeddings. First, as a baseline, we tried Random Networks, were the position of each nodes is drawn from $\mathcal{U}(-1,1)$ and where there is an edge between two nodes with probability $p$. Then we tried to use $k$-means to get the position of the nodes and added edges either between the 3 nearest neighbors in the graph or following a Barabasi-Albert procedure. The results are the MSE error on the validation set, we ran ten different seeds to get the standard deviation. All measures are normalized.
   }
   \label{tab:graphs}
 \end{table*}
@@ -210,21 +210,21 @@ We see that allowing position to move during training (\textsc{Adapt} in the tab
   \label{tab:nodes}
   \centering
   \begin{tabular}{lcccc} \toprule
-    \multirow{2}{*}{\textbf{Model}}                &                            & \multicolumn{3}{c}{\textbf{Nodes}}                                                 \\ \cmidrule(lr){3-5}
-                                                   &                            & 10                                 & 100                   & 1000                  \\ \hline
-    \multirow{2}{*}{\textbf{No Emb}}               & \scriptsize \textsc{Fixed} & 0.68 \tiny $\pm$ 0.01              & 0.69 \tiny $\pm$ 0.02 & 0.68 \tiny $\pm$ 0.01 \\
-                                                   & \scriptsize \textsc{Adapt} & 0.68 \tiny $\pm$ 0.01              & 0.66 \tiny $\pm$ 0.01 & 0.65 \tiny $\pm$ 0.01 \\
-    \multirow{2}{*}{\textbf{MLP}}                  & \scriptsize \textsc{Fixed} & 0.66 \tiny $\pm$ 0.01              & 0.66 \tiny $\pm$ 0.02 & 0.67 \tiny $\pm$ 0.02 \\
-                                                   & \scriptsize \textsc{Adapt} & 0.66 \tiny $\pm$ 0.01              & 0.64 \tiny $\pm$ 0.01 & 0.64 \tiny $\pm$ 0.03 \\
-    \multirow{2}{*}{\textbf{Added Pos-Enc + MLP}}  & \scriptsize \textsc{Fixed} & 1.03 \tiny $\pm$ 0.04              & 1.06 \tiny $\pm$ 0.02 & 1.04 \tiny $\pm$ 0.02 \\
-                                                   & \scriptsize \textsc{Adapt} & 1.07 \tiny $\pm$ 0.07              & 1.04 \tiny $\pm$ 0.03 & 1.03 \tiny $\pm$ 0.02 \\
-    \multirow{2}{*}{\textbf{Concat Pos-Enc + MLP}} & \scriptsize \textsc{Fixed} & 0.65 \tiny $\pm$ 0.01              & 0.63 \tiny $\pm$ 0.01 & 0.65 \tiny $\pm$ 0.02 \\
-                                                   & \scriptsize \textsc{Adapt} & 0.65 \tiny $\pm$ 0.02              & 0.63 \tiny $\pm$ 0.01 & 0.64 \tiny $\pm$ 0.01 \\
+    \multirow{2}{*}{\textbf{Model}}                &                            & \multicolumn{3}{c}{\textbf{Nodes}}                                                          \\ \cmidrule(lr){3-5}
+                                                   &                            & 10                                 & 100                            & 1000                  \\ \hline
+    \multirow{2}{*}{\textbf{No Emb}}               & \scriptsize \textsc{Fixed} & 0.68 \tiny $\pm$ 0.01              & 0.69 \tiny $\pm$ 0.02          & 0.68 \tiny $\pm$ 0.01 \\
+                                                   & \scriptsize \textsc{Adapt} & 0.68 \tiny $\pm$ 0.01              & 0.66 \tiny $\pm$ 0.01          & 0.65 \tiny $\pm$ 0.01 \\
+    \multirow{2}{*}{\textbf{MLP}}                  & \scriptsize \textsc{Fixed} & 0.66 \tiny $\pm$ 0.01              & 0.66 \tiny $\pm$ 0.02          & 0.67 \tiny $\pm$ 0.02 \\
+                                                   & \scriptsize \textsc{Adapt} & 0.66 \tiny $\pm$ 0.01              & 0.64 \tiny $\pm$ 0.01          & 0.64 \tiny $\pm$ 0.03 \\
+    \multirow{2}{*}{\textbf{Added Pos-Enc + MLP}}  & \scriptsize \textsc{Fixed} & 1.03 \tiny $\pm$ 0.04              & 1.06 \tiny $\pm$ 0.02          & 1.04 \tiny $\pm$ 0.02 \\
+                                                   & \scriptsize \textsc{Adapt} & 1.07 \tiny $\pm$ 0.07              & 1.04 \tiny $\pm$ 0.03          & 1.03 \tiny $\pm$ 0.02 \\
+    \multirow{2}{*}{\textbf{Concat Pos-Enc + MLP}} & \scriptsize \textsc{Fixed} & 0.65 \tiny $\pm$ 0.01              & 0.63 \tiny $\pm$ 0.01          & 0.65 \tiny $\pm$ 0.02 \\
+                                                   & \scriptsize \textsc{Adapt} & 0.65 \tiny $\pm$ 0.02              & \textbf{0.63 \tiny $\pm$ 0.01} & 0.64 \tiny $\pm$ 0.01 \\
 
     \bottomrule
   \end{tabular}
   \caption{
-    We tried different types of nodes embeddings for our model. The first one, is the baseline is to use no embedding layer and keep the aggregated wind value as the node state. The second one use a small MLP encoder to project the wind value to an higher dimensional space. Finally we explored two version of positional encoding layer. The results are the MSE error on the validation set, we ran ten different seeds to get the standard deviation. all measures are normalized.
+    We tried different types of nodes embeddings for our model. The first one, is the baseline is to use no embedding layer and keep the aggregated wind value as the node state. The second one use a small MLP encoder to project the wind value to an higher dimensional space. Finally we explored two version of positional encoding layer. The results are the MSE error on the validation set, we ran ten different seeds to get the standard deviation. All measures are normalized.
   }
 \end{table*}
 
@@ -232,16 +232,6 @@ We see that allowing position to move during training (\textsc{Adapt} in the tab
 Have a good baseline.
 
 
-
-\section{Communication}
-% (30 points)
-
-
-\begin{itemize}
-  \item Good report
-  \item Github
-  \item Streamlit
-\end{itemize}
 
 \section{Conclusion}
 
