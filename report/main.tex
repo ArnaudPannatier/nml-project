@@ -4,7 +4,7 @@
 %\def\familydefault{\rmdefault}    % uncomment for serif fonts in body
 
 \title{Graph Networks for Wind Nowcasting}
-\subtitle{ Graph Networks offer a flexible way of handling non-regular dataset such as sparse measures in the 3D space.}
+\subtitle{ Graph Networks offer a flexible way of handling non-regular dataset such as sparse measures in the 3D space. In this work we investigate wether different types of graphs and nodes features can help modelling the wind speed at cruising altitude.}
 \author{Arnaud Pannatier}
 \narrowmargins                    % uncomment for narrow margins
 \symmetricmargins                 % uncomment for equal margins
@@ -94,12 +94,9 @@ Usually the mesh for FEM simulations is created beforehand with denser region wh
 
 For GENs, the original way of creating graphs is to create a grid mesh that covers the whole space, and to encode the node position as parameters of the model, so that it can be optimized by gradient descent during training. In that case, the graph structure remains similar to the initial grid structure.
 
-\ap{TODO : graph}
-
 In both apporaches, only those graph structures have been used. In this work, we will consider three approaches for our graph topology. The first one, considered as baseline is constructed as follow : First we will take the $k$-means of the measure positions and we will add edges between the nearest neighbors. The second one will be a random network were the nodes position and their edges are taken at random, we will try different parameters $p$ and analyse its effect on the quality of the model.
 
-For the last graph structure, we will use a Barab\'asi-Albert model scheme for growing a graph to a given number of nodes, we will then associate to each node one of the $k$-means position.
-\ap{TODO : graph}
+For the last graph structure, we will use a Barab\'asi-Albert model scheme for growing a graph to a given number of nodes, we will then associate to each node one of the $k$-means position. Sketch of the graphs can be found in Figure \ref{fig:graphs}.
 
 
 \subsection{Features}
@@ -134,30 +131,10 @@ Euler equation:
 
 \subsection{Graph Types}
 
-\begin{table*}
-  \centering
-  \begin{tabular}{lcccc} \toprule
-    \multirow{2}{*}{\textbf{Model}}                      &                            & \multicolumn{3}{c}{\textbf{Nodes}}                                                           \\ \cmidrule(lr){3-5}
-                                                         &                            & 10                                 & 100                    & 1000                           \\ \hline
-    \multirow{2}{*}{\textbf{Random Network, $p=1\%$} }   & \scriptsize \textsc{Fixed} & 0.80  \tiny $\pm$ 0.04             & 0.71  \tiny $\pm$ 0.02 & 0.70 \tiny $\pm$ 0.02          \\
-                                                         & \scriptsize \textsc{Adapt} & 0.69 \tiny $\pm$ 0.01              & 0.65 \tiny $\pm$ 0.02  & \textbf{0.64 \tiny $\pm$ 0.02} \\
-    \multirow{2}{*}{\textbf{Random Network, $p=10\%$}}   & \scriptsize \textsc{Fixed} & 0.76  \tiny $\pm$ 0.03             & 0.70  \tiny $\pm$ 0.02 & 0.76 \tiny $\pm$ 0.02          \\
-                                                         & \scriptsize \textsc{Adapt} & 0.69 \tiny $\pm$ 0.01              & 0.66 \tiny $\pm$ 0.01  & 0.66 \tiny $\pm$ 0.02          \\
-    \multirow{2}{*}{\textbf{$k$-means, 3 nn.}          } & \scriptsize \textsc{Fixed} & 0.68  \tiny $\pm$ 0.01             & 0.69  \tiny $\pm$ 0.02 & 0.68 \tiny $\pm$ 0.01          \\
-                                                         & \scriptsize \textsc{Adapt} & 0.68 \tiny $\pm$ 0.01              & 0.66 \tiny $\pm$ 0.01  & 0.65 \tiny $\pm$ 0.01          \\
-    \multirow{2}{*}{\textbf{$k$-means, BA}             } & \scriptsize \textsc{Fixed} & 0.69  \tiny $\pm$ 0.01             & 0.68  \tiny $\pm$ 0.01 & 0.66 \tiny $\pm$ 0.02          \\
-                                                         & \scriptsize \textsc{Adapt} & 0.68 \tiny $\pm$ 0.02              & 0.65 \tiny $\pm$ 0.02  & \textbf{0.64 \tiny $\pm$ 0.01} \\
-
-    \bottomrule
-  \end{tabular}
-  \caption{
-    We tried different graph topology for our model that use no embeddings. First, as a baseline, we tried Random Networks, were the position of each nodes is drawn from $\mathcal{U}(-1,1)$ and where there is an edge between two nodes with probability $p$. Then we tried to use $k$-means to get the position of the nodes and added edges either between the 3 nearest neighbors in the graph or following a Barabasi-Albert procedure. The results are the MSE error on the validation set, we ran ten different seeds to get the standard deviation. all measures are normalized.
-  }
-  \label{tab:graphs}
-\end{table*}
-
+The foud different graphs that we tried are depicted in Figure \ref{fig:graphs}. The first row show that case were the nodes are fixed during training and the second row contains graph were the node position is optimized during training with gradient descent.
 The performance of the different graph types are displayed in Table \ref{tab:graphs}.
 We see that allowing position to move during training (\textsc{Adapt} in the table) are always performing better than their fixed counterpart. Random Graphs are the baseline and we expect them to perform poorly as they are initialized randomly without taking into account additional insight that we can have about the dataset. We see that indeed their performance is worse than the other models.
+
 
 \begin{figure}[htbp]
   \begin{subfigure}{0.24\textwidth}
@@ -201,7 +178,30 @@ We see that allowing position to move during training (\textsc{Adapt} in the tab
     \caption{$k$-means, BA}
   \end{subfigure}
   \caption{Graph structure for the different models. The first row show graphs where each node has a fixed position, in the second row we see how this position has evolved during training.}
+  \label{fig:graphs}
 \end{figure}
+
+\begin{table*}
+  \centering
+  \begin{tabular}{lcccc} \toprule
+    \multirow{2}{*}{\textbf{Model}}                      &                            & \multicolumn{3}{c}{\textbf{Nodes}}                                                           \\ \cmidrule(lr){3-5}
+                                                         &                            & 10                                 & 100                    & 1000                           \\ \hline
+    \multirow{2}{*}{\textbf{Random Network, $p=1\%$} }   & \scriptsize \textsc{Fixed} & 0.80  \tiny $\pm$ 0.04             & 0.71  \tiny $\pm$ 0.02 & 0.70 \tiny $\pm$ 0.02          \\
+                                                         & \scriptsize \textsc{Adapt} & 0.69 \tiny $\pm$ 0.01              & 0.65 \tiny $\pm$ 0.02  & \textbf{0.64 \tiny $\pm$ 0.02} \\
+    \multirow{2}{*}{\textbf{Random Network, $p=10\%$}}   & \scriptsize \textsc{Fixed} & 0.76  \tiny $\pm$ 0.03             & 0.70  \tiny $\pm$ 0.02 & 0.76 \tiny $\pm$ 0.02          \\
+                                                         & \scriptsize \textsc{Adapt} & 0.69 \tiny $\pm$ 0.01              & 0.66 \tiny $\pm$ 0.01  & 0.66 \tiny $\pm$ 0.02          \\
+    \multirow{2}{*}{\textbf{$k$-means, 3 nn.}          } & \scriptsize \textsc{Fixed} & 0.68  \tiny $\pm$ 0.01             & 0.69  \tiny $\pm$ 0.02 & 0.68 \tiny $\pm$ 0.01          \\
+                                                         & \scriptsize \textsc{Adapt} & 0.68 \tiny $\pm$ 0.01              & 0.66 \tiny $\pm$ 0.01  & 0.65 \tiny $\pm$ 0.01          \\
+    \multirow{2}{*}{\textbf{$k$-means, BA}             } & \scriptsize \textsc{Fixed} & 0.69  \tiny $\pm$ 0.01             & 0.68  \tiny $\pm$ 0.01 & 0.66 \tiny $\pm$ 0.02          \\
+                                                         & \scriptsize \textsc{Adapt} & 0.68 \tiny $\pm$ 0.02              & 0.65 \tiny $\pm$ 0.02  & \textbf{0.64 \tiny $\pm$ 0.01} \\
+
+    \bottomrule
+  \end{tabular}
+  \caption{
+    We tried different graph topology for our model that use no embeddings. First, as a baseline, we tried Random Networks, were the position of each nodes is drawn from $\mathcal{U}(-1,1)$ and where there is an edge between two nodes with probability $p$. Then we tried to use $k$-means to get the position of the nodes and added edges either between the 3 nearest neighbors in the graph or following a Barabasi-Albert procedure. The results are the MSE error on the validation set, we ran ten different seeds to get the standard deviation. all measures are normalized.
+  }
+  \label{tab:graphs}
+\end{table*}
 
 
 \subsection{Nodes features}
@@ -210,16 +210,16 @@ We see that allowing position to move during training (\textsc{Adapt} in the tab
   \label{tab:nodes}
   \centering
   \begin{tabular}{lcccc} \toprule
-    \multirow{2}{*}{\textbf{Model}}                &                            & \multicolumn{3}{c}{\textbf{Nodes}}                                                          \\ \cmidrule(lr){3-5}
-                                                   &                            & 10                                 & 100                   & 1000                           \\ \hline
-    \multirow{2}{*}{\textbf{No Emb}}               & \scriptsize \textsc{Fixed} & 0.68 \tiny $\pm$ 0.01              & 0.69 \tiny $\pm$ 0.02 & 0.68 \tiny $\pm$ 0.01          \\
-                                                   & \scriptsize \textsc{Adapt} & 0.68 \tiny $\pm$ 0.01              & 0.66 \tiny $\pm$ 0.01 & 0.65 \tiny $\pm$ 0.01          \\
-    \multirow{2}{*}{\textbf{MLP}}                  & \scriptsize \textsc{Fixed} & 0.66 \tiny $\pm$ 0.01              & 0.66 \tiny $\pm$ 0.02 & 0.67 \tiny $\pm$ 0.02          \\
-                                                   & \scriptsize \textsc{Adapt} & 0.XX \tiny $\pm$ 0.XX              & 0.XX \tiny $\pm$ 0.XX & 0. \tiny $\pm$ 0.              \\
-    \multirow{2}{*}{\textbf{Added Pos-Enc + MLP}}  & \scriptsize \textsc{Fixed} & 1.03 \tiny $\pm$ 0.04              & 1.06 \tiny $\pm$ 0.02 & 1.04 \tiny $\pm$ 0.02          \\
-                                                   & \scriptsize \textsc{Adapt} & 0.XX \tiny $\pm$ 0.XX              & 0.XX \tiny $\pm$ 0.XX & \textbf{0.00 \tiny $\pm$ 0.00} \\
-    \multirow{2}{*}{\textbf{Concat Pos-Enc + MLP}} & \scriptsize \textsc{Fixed} & 0.65 \tiny $\pm$ 0.01              & 0.63 \tiny $\pm$ 0.01 & 0.65 \tiny $\pm$ 0.02          \\
-                                                   & \scriptsize \textsc{Adapt} & 0.XX \tiny $\pm$ 0.XX              & 0.XX \tiny $\pm$ 0.XX & 0.XX \tiny $\pm$ 0.            \\
+    \multirow{2}{*}{\textbf{Model}}                &                            & \multicolumn{3}{c}{\textbf{Nodes}}                                                 \\ \cmidrule(lr){3-5}
+                                                   &                            & 10                                 & 100                   & 1000                  \\ \hline
+    \multirow{2}{*}{\textbf{No Emb}}               & \scriptsize \textsc{Fixed} & 0.68 \tiny $\pm$ 0.01              & 0.69 \tiny $\pm$ 0.02 & 0.68 \tiny $\pm$ 0.01 \\
+                                                   & \scriptsize \textsc{Adapt} & 0.68 \tiny $\pm$ 0.01              & 0.66 \tiny $\pm$ 0.01 & 0.65 \tiny $\pm$ 0.01 \\
+    \multirow{2}{*}{\textbf{MLP}}                  & \scriptsize \textsc{Fixed} & 0.66 \tiny $\pm$ 0.01              & 0.66 \tiny $\pm$ 0.02 & 0.67 \tiny $\pm$ 0.02 \\
+                                                   & \scriptsize \textsc{Adapt} & 0.66 \tiny $\pm$ 0.01              & 0.64 \tiny $\pm$ 0.01 & 0.64 \tiny $\pm$ 0.03 \\
+    \multirow{2}{*}{\textbf{Added Pos-Enc + MLP}}  & \scriptsize \textsc{Fixed} & 1.03 \tiny $\pm$ 0.04              & 1.06 \tiny $\pm$ 0.02 & 1.04 \tiny $\pm$ 0.02 \\
+                                                   & \scriptsize \textsc{Adapt} & 1.07 \tiny $\pm$ 0.07              & 1.04 \tiny $\pm$ 0.03 & 1.03 \tiny $\pm$ 0.02 \\
+    \multirow{2}{*}{\textbf{Concat Pos-Enc + MLP}} & \scriptsize \textsc{Fixed} & 0.65 \tiny $\pm$ 0.01              & 0.63 \tiny $\pm$ 0.01 & 0.65 \tiny $\pm$ 0.02 \\
+                                                   & \scriptsize \textsc{Adapt} & 0.65 \tiny $\pm$ 0.02              & 0.63 \tiny $\pm$ 0.01 & 0.64 \tiny $\pm$ 0.01 \\
 
     \bottomrule
   \end{tabular}
@@ -249,7 +249,6 @@ Have a good baseline.
 \bibliography{main}
 \FloatBarrier
 \section{Appendix}
-\ap{Yasmin: write your contribution here}
 \begin{table*}
   \label{tab:nodes}
   \centering
@@ -265,7 +264,7 @@ Have a good baseline.
                                         & Presentation tool &                    &                 \\
     \bottomrule
   \end{tabular}
-  \caption{ Workload repartition between the two teammates }
+  \caption{ Workload repartition between the two teammates \color{red} TODO : Yasmin write your contributions here}
 \end{table*}
 
 
