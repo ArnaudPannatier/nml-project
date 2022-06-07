@@ -38,7 +38,7 @@ if __name__ == "__main__":
     train_dataset, val_dataset = datasets(os.getenv("ROOT_FOLDER"))
 
     kmeans_pos = kmeans_from_dataset(k=args.nodes)
-    gs = GraphStructure(kmeans_pos, *neighbors_edges(kmeans_pos, 3), fixed=True)
+    gs = GraphStructure(kmeans_pos, *neighbors_edges(kmeans_pos, 3), fixed=False)
 
     if args.emb == "noemb":
         model = GENwoenc(gs, 3, 2, 32, 2, 3)
