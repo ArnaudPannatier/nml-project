@@ -17,6 +17,7 @@
 \usepackage{caption}
 \usepackage{subcaption}
 \usepackage{wrapfig}
+\usepackage{placeins}
 
 \newcommand{\ap}[1]{\marginpar{{\tiny \color{red} [AP] #1}}}
 \begin{document}
@@ -240,5 +241,26 @@ Have a good baseline.
 
 \bibliographystyle{apalike}
 \bibliography{main}
+\FloatBarrier
+\section{Appendix}
+\ap{Yasmin: write your contribution here}
+\begin{table*}
+  \label{tab:nodes}
+  \centering
+  \begin{tabular}{llrr} \toprule
+                                        &                   & \textbf{Arnaud}    & \textbf{Yasmin} \\ \midrule
+    \multirow{4}{*}{\textbf{Homeworks}} & HW1               & 100 \%             &                 \\
+                                        & HW2               & 1-version + review &                 \\
+                                        & HW3               & 100 \%             &                 \\
+                                        & HW4               & 100 \%             &                 \\ \cmidrule{2-4}
+    \multirow{3}{*}{\textbf{Project}}   & Code              & 100 \%             &                 \\
+                                        & Report            & 100 \%             &                 \\
+                                        & Slides            &                    &                 \\
+                                        & Presentation tool &                    &                 \\
+    \bottomrule
+  \end{tabular}
+  \caption{ Workload repartition between the two teammates }
+\end{table*}
+
 
 \end{document}
