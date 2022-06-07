@@ -12,6 +12,10 @@
 \course{EE-452}{Network Machine Learning}
 \usepackage{booktabs}       % professional-quality tables
 \usepackage{multirow}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{caption}
+\usepackage{subcaption}
 
 \newcommand{\ap}[1]{\marginpar{{\tiny \color{red} [AP] #1}}}
 \begin{document}
@@ -32,14 +36,21 @@ Let $\mathbb{X}, \mathbb{I}, \mathbb{O}$ be three bounded metric spaces, and def
 In the case of wind nowcasting, $\mathbb{X} = \mathbb{R}^{3} \times \mathbb{R}^{+}$, which corresponds to 3 spatial coordinates and one temporal and $\mathbb{I} = \mathbb{O} = \mathbb{R}^{2}$ which encode the wind in the $(x,y)$ plane.
 We want to learn the transformation which maps a function $f$ to $g$.
 We only have access to $f$ by data $(x, i)  \in \mathbb{X} \times \mathbb{I}$ of measures $i$ at position $x$ and we know $g$ only through a set $(x', o) \in \mathbb{X} \times \mathbb{O}$ of measurements $o$ at position $x'$.
-So we learn SFTs from data using multiple sets of meaures corresponding to many $(f,g)$ pairs with the objective of minimizing the distance in the output metric space $\mathbb{O}$ between predictions and references.
+So we learn this mapping from data using multiple sets of meaures corresponding to many $(f,g)$ pairs with the objective of minimizing the distance in the output metric space $\mathbb{O}$ between predictions and references.
 
 \section{Related works}
 
 
 \subsection{Graph Element Networks (GENs)} \label{ssec:gen}
-Graph Element Networks \cite{alet2019gen} aim to model SFTs using a non-regular graphs with nodes in the underlying space $\mathbb{X}$. Each measurement $(x, i)$ is encoded using a small MLP and contributes to the neighbouring nodes values. The model then process this latent variable using $T \in \mathbb{N}$ steps of message passing, the exact formulation of its message passing scheme can be found in the appendix.
-In order to predict at a new query position, the model linearly extrapolates in latent space, and decodes using a small MLP modelling the transformation from latent to output space.
+Graph Element Networks \cite{alet2019gen} aim to model SFTs using a non-regular graphs with nodes in the underlying space $\mathbb{X}$. Each measurement $(x, i)$ is encoded using a small MLP, the initial latent feature of one node is then computing by averaging the embeddings of the measurements based on their distance to the node. The model then process this latent variable using $T \in \mathbb{N}$ steps of message passing, using the following equations:
+
+\begin{align}
+  m_{ij}^{t + 1} = m_e(l_{i}^{t}, l_{j}^{t}) \\
+  l_{j}^{t + 1} = m_{n}(l_{i}^{t}, \sum_{(i,j) \in \mathcal{N}} m_{ij}^{t + 1})
+\end{align}
+
+Where $m_e, m_n$ are multilayer perceptrons and $l_{i}^{t}$ is the latent state of nodes $i$ at the $t$-th step of message passing. In that representation no edge features are used.
+In order to predict a value at a new query position, the model linearly extrapolates in latent space, and decodes using a small MLP modelling the transformation from latent to output space.
 \ap{advantages -- drawbacks}
 
 \subsection{Finite Element Networks}
@@ -68,7 +79,7 @@ For GENs, the original way of creating graphs is to create a grid mesh that cove
 
 In both apporaches, only those graph structures have been used. In this work, we will consider three approaches for our graph topology. The first one, considered as baseline is constructed as follow : First we will take the $k$-means of the measure positions and we will add edges between the nearest neighbors. The second one will be a random network were the nodes position and their edges are taken at random, we will try different parameters $p$ and analyse its effect on the quality of the model.
 
-We will use a totally different approaches for the last graph structure, we will try to design a custom Barab\'asi-Albert model.
+For the last graph structure, we will use a Barab\'asi-Albert model scheme for growing a graph to a given number of nodes, we will then associate to each node one of the $k$-means position.
 \ap{TODO : graph}
 
 
@@ -97,44 +108,66 @@ Euler equation:
 % You are free to use the tools that you want. We list below some examples of properties that you can analyze:
 % \begin{itemize}
 %     \item analysis of the attributes (e.g., their distribution, smoothness, graph Fourier transform). If the task is classification, are the labels balanced?
-%     \item clustering (spectral clustering, k-means)
+%     \item clustering (spectral clustering, $k$-means)
 % \end{itemize}
 % Vizualizations of the network may be very helpful
 \section{Exploitation}
-% (40 points)
-
-% If you plan to use graph neural networks to solve a task, remember that extensive cross validation of the architecture is expensive and may not be very informative. It it therefore important to spend time beforehand to understand what architecture should work well: what aggregation function is the most relevant for this data? What matters most: the graph structure itself, the node features, the edge features?
-
-Here the node features is the most informative, maybe the edge features depending on the exploration of 1.
 
 \subsection{Graph Types}
 
 \begin{table*}
-  \label{tab:results}
   \centering
   \begin{tabular}{lcccc} \toprule
-    \multirow{2}{*}{\textbf{Model}}                    &                            & \multicolumn{3}{c}{\textbf{Nodes}}                                                           \\ \cmidrule(lr){3-5}
-                                                       &                            & 10                                 & 100                    & 1000                           \\ \hline
-    \multirow{2}{*}{\textbf{Random Network, $p=1\%$} } & \scriptsize \textsc{Fixed} & 0.80  \tiny $\pm$ 0.04             & 0.71  \tiny $\pm$ 0.02 & 0.70 \tiny $\pm$ 0.02          \\
-                                                       & \scriptsize \textsc{Adapt} & 0.69 \tiny $\pm$ 0.01              & 0.65 \tiny $\pm$ 0.02  & \textbf{0.64 \tiny $\pm$ 0.02} \\
-    \multirow{2}{*}{\textbf{Random Network, $p=10\%$}} & \scriptsize \textsc{Fixed} & 0.76  \tiny $\pm$ 0.03             & 0.70  \tiny $\pm$ 0.02 & 0.76 \tiny $\pm$ 0.02          \\
-                                                       & \scriptsize \textsc{Adapt} & 0.69 \tiny $\pm$ 0.01              & 0.66 \tiny $\pm$ 0.01  & 0.66 \tiny $\pm$ 0.02          \\
-    \multirow{2}{*}{\textbf{K-Means, 3 nn.}          } & \scriptsize \textsc{Fixed} & 0.68  \tiny $\pm$ 0.01             & 0.69  \tiny $\pm$ 0.02 & 0.68 \tiny $\pm$ 0.01          \\
-                                                       & \scriptsize \textsc{Adapt} & 0.68 \tiny $\pm$ 0.01              & 0.66 \tiny $\pm$ 0.01  & 0.65 \tiny $\pm$ 0.01          \\
-    \multirow{2}{*}{\textbf{K-Means, BA}             } & \scriptsize \textsc{Fixed} & 0.69  \tiny $\pm$ 0.01             & 0.68  \tiny $\pm$ 0.01 & 0.66 \tiny $\pm$ 0.02          \\
-                                                       & \scriptsize \textsc{Adapt} & 0.68 \tiny $\pm$ 0.02              & 0.65 \tiny $\pm$ 0.02  & \textbf{0.64 \tiny $\pm$ 0.01} \\
+    \multirow{2}{*}{\textbf{Model}}                      &                            & \multicolumn{3}{c}{\textbf{Nodes}}                                                           \\ \cmidrule(lr){3-5}
+                                                         &                            & 10                                 & 100                    & 1000                           \\ \hline
+    \multirow{2}{*}{\textbf{Random Network, $p=1\%$} }   & \scriptsize \textsc{Fixed} & 0.80  \tiny $\pm$ 0.04             & 0.71  \tiny $\pm$ 0.02 & 0.70 \tiny $\pm$ 0.02          \\
+                                                         & \scriptsize \textsc{Adapt} & 0.69 \tiny $\pm$ 0.01              & 0.65 \tiny $\pm$ 0.02  & \textbf{0.64 \tiny $\pm$ 0.02} \\
+    \multirow{2}{*}{\textbf{Random Network, $p=10\%$}}   & \scriptsize \textsc{Fixed} & 0.76  \tiny $\pm$ 0.03             & 0.70  \tiny $\pm$ 0.02 & 0.76 \tiny $\pm$ 0.02          \\
+                                                         & \scriptsize \textsc{Adapt} & 0.69 \tiny $\pm$ 0.01              & 0.66 \tiny $\pm$ 0.01  & 0.66 \tiny $\pm$ 0.02          \\
+    \multirow{2}{*}{\textbf{$k$-means, 3 nn.}          } & \scriptsize \textsc{Fixed} & 0.68  \tiny $\pm$ 0.01             & 0.69  \tiny $\pm$ 0.02 & 0.68 \tiny $\pm$ 0.01          \\
+                                                         & \scriptsize \textsc{Adapt} & 0.68 \tiny $\pm$ 0.01              & 0.66 \tiny $\pm$ 0.01  & 0.65 \tiny $\pm$ 0.01          \\
+    \multirow{2}{*}{\textbf{$k$-means, BA}             } & \scriptsize \textsc{Fixed} & 0.69  \tiny $\pm$ 0.01             & 0.68  \tiny $\pm$ 0.01 & 0.66 \tiny $\pm$ 0.02          \\
+                                                         & \scriptsize \textsc{Adapt} & 0.68 \tiny $\pm$ 0.02              & 0.65 \tiny $\pm$ 0.02  & \textbf{0.64 \tiny $\pm$ 0.01} \\
 
     \bottomrule
   \end{tabular}
   \caption{
-    Graph Types results
+    We tried different graph topology for our model that use no embeddings. First, as a baseline, we tried Random Networks, were the position of each nodes is drawn from $\mathcal{N}(0,2)$ and where there is an edge between two nodes with probability $p$. Then we tried to use $k$-means to get the position of the nodes and added edges either between the 3 nearest neighbors in the graph or following a Barabasi-Albert procedure. The results are the MSE error on the validation set, we ran ten different seeds to get the standard deviation. all measures are normalized.
   }
+  \label{tab:graphs}
 \end{table*}
+
+The performance of the different graph types are displayed in Table \ref{tab:graphs}.
+We see that allowing position to move during training (\textsc{Adapt} in the table) are always performing better than their fixed counterpart. Random Graphs are the baseline and we expect them to perform poorly as they are initialized randomly without taking into account additional insight that we can have about the dataset. We see that indeed their performance is worse than the other models.
+
+\begin{figure}[htbp]
+  \begin{subfigure}{0.24\textwidth}
+    \centering
+    \includegraphics[trim={0 13.2cm 29cm 0},clip,width=\textwidth]{../results/rn1-100N-noemb0}
+    \caption{Random network with $p=1\%$}
+  \end{subfigure}
+  \begin{subfigure}{0.24\textwidth}
+    \centering
+    \includegraphics[trim={0 13.2cm 29cm 0},clip,width=\textwidth]{../results/rn10-100N-noemb0}
+    \caption{Random network with $p=10\%$}
+  \end{subfigure}
+  \begin{subfigure}{0.24\textwidth}
+    \centering
+    \includegraphics[trim={0 13.2cm 29cm 0},clip,width=\textwidth]{../results/nn-100N-noemb0}
+    \caption{$k$-means, 3nn}
+  \end{subfigure}
+  \begin{subfigure}{0.24\textwidth}
+    \centering
+    \includegraphics[trim={0 13.2cm 29cm 0},clip,width=\textwidth]{../results/ba-100N-noemb0}
+    \caption{$k$-means, BA}
+  \end{subfigure}
+\end{figure}
+
 
 \subsection{Nodes features}
 
 \begin{table*}
-  \label{tab:results}
+  \label{tab:nodes}
   \centering
   \begin{tabular}{lcccc} \toprule
     \multirow{2}{*}{\textbf{Model}}                &                            & \multicolumn{3}{c}{\textbf{Nodes}}                                                          \\ \cmidrule(lr){3-5}
@@ -151,27 +184,14 @@ Here the node features is the most informative, maybe the edge features dependin
     \bottomrule
   \end{tabular}
   \caption{
-    Nodes Types results
+    We tried different types of nodes embeddings for our model. The first one, is the baseline is to use no embedding layer and keep the aggregated wind value as the node state. The second one use a small MLP encoder to project the wind value to an higher dimensional space. Finally we explored two version of positional encoding layer. The results are the MSE error on the validation set, we ran ten different seeds to get the standard deviation. all measures are normalized.
   }
 \end{table*}
 
-% You can also consider simple baselines such as logisitic regression on preprocessed features. Such baselines are often quite strong, and can give a good idea of the performance of your graph network.
 
 Have a good baseline.
 
-% Some tools that may be useful:
 
-% \begin{itemize}
-%     \item graph Fourier transform
-%     \item regularization (graph Tikhonov, graph total variation)
-%     \item dimensionality reduction (PCA, MDS, LLE, ISOMAP, Laplacian eigenmaps, t-SNE)
-% \end{itemize}
-
-% Critical evaluation of the results
-% subjective or objective (baseline, existing work)
-% state the limitations: when does the method fail?
-
-% We insist on the fact that you will be graded based on the process that led you to your final model, but not so much on the final performance that you get.
 
 \section{Communication}
 % (30 points)
@@ -182,6 +202,8 @@ Have a good baseline.
   \item Github
   \item Streamlit
 \end{itemize}
+
+\section{Conclusion}
 
 \bibliographystyle{apalike}
 \bibliography{main}
