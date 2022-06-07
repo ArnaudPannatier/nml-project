@@ -43,7 +43,7 @@ So we learn this mapping from data using multiple sets of meaures corresponding 
 
 
 \subsection{Graph Element Networks (GENs)} \label{ssec:gen}
-Graph Element Networks \cite{alet2019gen} aim to model SFTs using a non-regular graphs with nodes in the underlying space $\mathbb{X}$. Each measurement $(x, i)$ is encoded using a small MLP, the initial latent feature of one node is then computing by averaging the embeddings of the measurements based on their distance to the node. The model then process this latent variable using $T \in \mathbb{N}$ steps of message passing, using the following equations:
+Graph Element Networks \cite{alet2019gen} aim to model field transformations using a non-regular graphs with nodes in the underlying space $\mathbb{X}$. Each measurement $(x, i)$ is encoded using a small MLP, the initial latent feature of one node is then computing by averaging the embeddings of the measurements based on their distance to the node. The model then process this latent variable using $T \in \mathbb{N}$ steps of message passing, using the following equations:
 
 \begin{align}
   m_{ij}^{t + 1} = m_e(l_{i}^{t}, l_{j}^{t}) \\
@@ -52,6 +52,13 @@ Graph Element Networks \cite{alet2019gen} aim to model SFTs using a non-regular 
 
 Where $m_e, m_n$ are multilayer perceptrons and $l_{i}^{t}$ is the latent state of nodes $i$ at the $t$-th step of message passing. In that representation no edge features are used.
 In order to predict a value at a new query position, the model linearly extrapolates in latent space, and decodes using a small MLP modelling the transformation from latent to output space.
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=\textwidth]{GEN}
+  \caption{GEN architecture. The measures are first encoded to a latent space, then the initial node feature is computed by aggregate the closer encoded measures, processing is done by message passing and the final measures are retrieved by first interpolating the nodes features at the query position and then decoding.}
+\end{figure}
+
 \ap{advantages -- drawbacks}
 
 \subsection{Finite Element Networks}
