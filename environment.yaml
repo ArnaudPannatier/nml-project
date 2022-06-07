@@ -19,3 +19,4 @@ dependencies:
   - pandas
   - pyyaml
   - more-itertools
+  - plotly
