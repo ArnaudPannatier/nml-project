@@ -132,7 +132,7 @@ Euler equation:
     \bottomrule
   \end{tabular}
   \caption{
-    We tried different graph topology for our model that use no embeddings. First, as a baseline, we tried Random Networks, were the position of each nodes is drawn from $\mathcal{N}(0,2)$ and where there is an edge between two nodes with probability $p$. Then we tried to use $k$-means to get the position of the nodes and added edges either between the 3 nearest neighbors in the graph or following a Barabasi-Albert procedure. The results are the MSE error on the validation set, we ran ten different seeds to get the standard deviation. all measures are normalized.
+    We tried different graph topology for our model that use no embeddings. First, as a baseline, we tried Random Networks, were the position of each nodes is drawn from $\mathcal{U}(-1,1)$ and where there is an edge between two nodes with probability $p$. Then we tried to use $k$-means to get the position of the nodes and added edges either between the 3 nearest neighbors in the graph or following a Barabasi-Albert procedure. The results are the MSE error on the validation set, we ran ten different seeds to get the standard deviation. all measures are normalized.
   }
   \label{tab:graphs}
 \end{table*}
@@ -141,6 +141,26 @@ The performance of the different graph types are displayed in Table \ref{tab:gra
 We see that allowing position to move during training (\textsc{Adapt} in the table) are always performing better than their fixed counterpart. Random Graphs are the baseline and we expect them to perform poorly as they are initialized randomly without taking into account additional insight that we can have about the dataset. We see that indeed their performance is worse than the other models.
 
 \begin{figure}[htbp]
+  \begin{subfigure}{0.24\textwidth}
+    \centering
+    \includegraphics[trim={0 13.2cm 29.35cm 0},clip,width=\textwidth]{../results/rn1-100N-noemb-fixed}
+    \caption{Random network with $p=1\%$}
+  \end{subfigure}
+  \begin{subfigure}{0.24\textwidth}
+    \centering
+    \includegraphics[trim={0 13.2cm 29.35cm 0},clip,width=\textwidth]{../results/rn10-100N-noemb-fixed}
+    \caption{Random network with $p=10\%$}
+  \end{subfigure}
+  \begin{subfigure}{0.24\textwidth}
+    \centering
+    \includegraphics[trim={0 13.2cm 29.35cm 0},clip,width=\textwidth]{../results/nn-100N-noemb-fixed}
+    \caption{$k$-means, 3nn}
+  \end{subfigure}
+  \begin{subfigure}{0.24\textwidth}
+    \centering
+    \includegraphics[trim={0 13.2cm 29cm 0},clip,width=\textwidth]{../results/ba-100N-noemb-fixed}
+    \caption{$k$-means, BA}
+  \end{subfigure}
   \begin{subfigure}{0.24\textwidth}
     \centering
     \includegraphics[trim={0 13.2cm 29cm 0},clip,width=\textwidth]{../results/rn1-100N-noemb0}
@@ -161,6 +181,7 @@ We see that allowing position to move during training (\textsc{Adapt} in the tab
     \includegraphics[trim={0 13.2cm 29cm 0},clip,width=\textwidth]{../results/ba-100N-noemb0}
     \caption{$k$-means, BA}
   \end{subfigure}
+  \caption{Graph structure for the different models. The first row show graphs where each node has a fixed position, in the second row we see how this position has evolved during training.}
 \end{figure}
 
 
