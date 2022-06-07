@@ -116,21 +116,17 @@ We assume that this part is the most important to get a good model. So we will e
 \subsection{Edge features}
 A contribution of this work is to add edge features to GENs. We think that good graph networks for space modeling should be able to compute an approximation of the derivatives of values in the graph. We will take Euler scheme as an inspiration and have an explicit design for edge features that allows this kind of computation. We will make an ablation with learned features and see their effect on the quality of the model.
 
-
-\ap{TODO: sketch}
-Euler equation:
-
+The inspiration is that the evolution of the wind speed is governed by the local movement equation:
 \begin{equation}
   \rho \mathbf{g} - \nabla p = \rho\frac{d\mathbf{v}}{dt}
 \end{equation}
 
+Roughly when using a traditional solver we will approximate the spatial and temporal derivatives using finite differences:
+\begin{equation}
+  \frac{u_{i}^{n + 1} - u_i^{n}}{\Delta t} = F_{i}^{n}(u,x,t, \frac{\partial u}{\partial x}, i\frac{\partial^2 u}{\partial x^{2}}    )
+\end{equation}
+So we think that adding edge features that hold the distance between two nodes can help model the PDEs.
 
-% You are free to use the tools that you want. We list below some examples of properties that you can analyze:
-% \begin{itemize}
-%     \item analysis of the attributes (e.g., their distribution, smoothness, graph Fourier transform). If the task is classification, are the labels balanced?
-%     \item clustering (spectral clustering, $k$-means)
-% \end{itemize}
-% Vizualizations of the network may be very helpful
 \section{Exploitation}
 
 \subsection{Graph Types}
