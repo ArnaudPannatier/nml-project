@@ -19,11 +19,12 @@
 \maketitle
 
 \section{Introduction}
-Air Traffic Controllers (ATC) need to have access to reliable wind speed forecasts to organize the airspace efficiently.
-However, at cruising altitudes, the only measures that one has access to are measured by airplanes that record the wind along their trajectories.
-Therefore, air traffic controllers need to have very short-term forecasts of about 30 minutes.
-In that range, called nowcasting, one gets the most accurate forecast by extrapolating from the latest measures available rather than trying to solve expensive numerical equations solvers.
-It is in that range that deep learning methods can offer a lot, as meteorological data is often highly available, and deep learning methods thrive in that environment.
+Air Traffic Controllers (ATC) need to have access to reliable wind speed forecasts to organize the airspace efficiently. At cruising altitudes, the only measures that one has access to are measured by airplanes that record the wind along their trajectories, and fortunately, as there are a lot of planes flying in the airspace ATCs have recorded a lot of data. Their interest is to be able to a good prediction during the window of time they operate which is rather short (30min up to a few hours) In that range, called nowcasting, one gets the most accurate forecast by extrapolating from the latest measures available rather than trying to solve expensive numerical equations solvers.
+It is in that range that deep learning methods can offer a lot, as meteorological data is often highly available. Sadly this data are recorded along trajectories and is sparse in space, so we cannot uses standard methods such as CNN to deal with it. We noticed that it could be a good candidate for Graph Networks are their inductive bias makes them good candidates for this task.
+
+This work will use graph networks to forecast the wind speed at cruising altitudes. We will use the \textit{SkySoft ATM MALAT Wind Speed Dataset} \cite{skysoft2021dataset} and starting from an Graph Element Network (GEN) \cite{alet2019gen} implementation, we will analyse the effect of the topology of the graphs and different nodes and edge features on the performance of the model.
+
+
 
 \subsection{Problem formulation}
 
@@ -135,18 +136,22 @@ Here the node features is the most informative, maybe the edge features dependin
 \begin{table*}
   \label{tab:results}
   \centering
-  \begin{tabular}{lccc} \toprule
-    \textbf{Model}                    & \multicolumn{3}{c}{\textbf{Nodes}}                                                           \\ \cmidrule(lr){2-4}
-                                      & 10                                 & 100                    & 1000                           \\ \hline
-    \textbf{Random Network, $p=1\%$}  & 0.80  \tiny $\pm$ 0.04             & 0.71  \tiny $\pm$ 0.02 & 0.70 \tiny $\pm$ 0.02          \\
-    \textbf{Random Network, $p=10\%$} & 0.76  \tiny $\pm$ 0.03             & 0.70  \tiny $\pm$ 0.02 & 0.76 \tiny $\pm$ 0.02          \\
-    \textbf{K-Means, 3 nn.}           & 0.68  \tiny $\pm$ 0.01             & 0.69  \tiny $\pm$ 0.02 & 0.68 \tiny $\pm$ 0.01          \\
-    \textbf{K-Means, BA}              & 0.69  \tiny $\pm$ 0.01             & 0.68  \tiny $\pm$ 0.01 & \textbf{0.66 \tiny $\pm$ 0.02} \\
+  \begin{tabular}{lcccc} \toprule
+    \multirow{2}{*}{\textbf{Model}}                &                            & \multicolumn{3}{c}{\textbf{Nodes}}                                                          \\ \cmidrule(lr){3-5}
+                                                   &                            & 10                                 & 100                   & 1000                           \\ \hline
+    \multirow{2}{*}{\textbf{No Emb}}               & \scriptsize \textsc{Fixed} & 0.68 \tiny $\pm$ 0.01              & 0.69 \tiny $\pm$ 0.02 & 0.68 \tiny $\pm$ 0.01          \\
+                                                   & \scriptsize \textsc{Adapt} & 0.68 \tiny $\pm$ 0.01              & 0.66 \tiny $\pm$ 0.01 & 0.65 \tiny $\pm$ 0.01          \\
+    \multirow{2}{*}{\textbf{MLP}}                  & \scriptsize \textsc{Fixed} & 0.66 \tiny $\pm$ 0.01              & 0.66 \tiny $\pm$ 0.02 & 0.67 \tiny $\pm$ 0.02          \\
+                                                   & \scriptsize \textsc{Adapt} & 0.XX \tiny $\pm$ 0.XX              & 0.XX \tiny $\pm$ 0.XX & 0. \tiny $\pm$ 0.              \\
+    \multirow{2}{*}{\textbf{Added Pos-Enc + MLP}}  & \scriptsize \textsc{Fixed} & 1.03 \tiny $\pm$ 0.04              & 1.06 \tiny $\pm$ 0.02 & 1.04 \tiny $\pm$ 0.02          \\
+                                                   & \scriptsize \textsc{Adapt} & 0.XX \tiny $\pm$ 0.XX              & 0.XX \tiny $\pm$ 0.XX & \textbf{0.00 \tiny $\pm$ 0.00} \\
+    \multirow{2}{*}{\textbf{Concat Pos-Enc + MLP}} & \scriptsize \textsc{Fixed} & 0.65 \tiny $\pm$ 0.01              & 0.63 \tiny $\pm$ 0.01 & 0.65 \tiny $\pm$ 0.02          \\
+                                                   & \scriptsize \textsc{Adapt} & 0.XX \tiny $\pm$ 0.XX              & 0.XX \tiny $\pm$ 0.XX & 0.XX \tiny $\pm$ 0.            \\
 
     \bottomrule
   \end{tabular}
   \caption{
-    Graph Types results
+    Nodes Types results
   }
 \end{table*}
 
