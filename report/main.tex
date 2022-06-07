@@ -24,6 +24,12 @@
 
 \maketitle
 
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[trim={350 200 450 150},clip,width=\textwidth]{figs/south-gen.png}
+\end{figure}
+
+\newpage
 \section{Introduction}
 Air Traffic Controllers (ATC) need to have access to reliable wind speed forecasts to organize the airspace efficiently. At cruising altitudes, the only measures that one has access to are measured by airplanes that record the wind along their trajectories, and fortunately, as there are a lot of planes flying in the airspace ATCs have recorded a lot of data. Their interest is to be able to a good prediction during the window of time they operate which is rather short (30min up to a few hours) In that range, called nowcasting, one gets the most accurate forecast by extrapolating from the latest measures available rather than trying to solve expensive numerical equations solvers.
 It is in that range that deep learning methods can offer a lot, as meteorological data is often highly available. Sadly this data are recorded along trajectories and is sparse in space, so we cannot uses standard methods such as CNN to deal with it. We noticed that it could be a good candidate for Graph Networks are their inductive bias makes them good candidates for this task.
