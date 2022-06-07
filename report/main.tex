@@ -55,7 +55,7 @@ In order to predict a value at a new query position, the model linearly extrapol
 
 \begin{figure}[htbp]
   \centering
-  \includegraphics[width=\textwidth]{GEN}
+  \includegraphics[width=\textwidth]{figs/GEN}
   \caption{GEN architecture. The measures are first encoded to a latent space, then the initial node feature is computed by aggregate the closer encoded measures, processing is done by message passing and the final measures are retrieved by first interpolating the nodes features at the query position and then decoding.}
 \end{figure}
 
@@ -81,7 +81,7 @@ Usually the mesh for FEM simulations is created beforehand with denser region wh
 
 \begin{wrapfigure}{l}{5.5cm}
   \centering
-  \includegraphics[trim={780 0 300 50},clip,width=0.3\textwidth]{mesh-dataset}
+  \includegraphics[trim={780 0 300 50},clip,width=0.3\textwidth]{figs/mesh-dataset}
   \caption{Typical FEM meshing \cite{pfaff2020learning}}
 \end{wrapfigure}
 
