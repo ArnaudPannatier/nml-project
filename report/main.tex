@@ -32,10 +32,10 @@
 
 \newpage
 \section{Introduction}
-Air Traffic Controllers (ATC) need to have access to reliable wind speed forecasts to organize the airspace efficiently. At cruising altitudes, the only measures that one has access to are measured by airplanes that record the wind along their trajectories, and fortunately, as there are a lot of planes flying in the airspace ATCs have recorded a lot of data. Their interest is to be able to a good prediction during the window of time they operate which is rather short (30min up to a few hours) In that range, called nowcasting, one gets the most accurate forecast by extrapolating from the latest measures available rather than trying to solve expensive numerical equations solvers.
-It is in that range that deep learning methods can offer a lot, as meteorological data is often highly available. Sadly these data are recorded along trajectories and are sparse in space, so we cannot use standard methods such as CNN to deal with it. We noticed that it could be a good candidate for Graph Networks are their inductive bias makes them good candidates for this task.
+Air Traffic Controllers (ATC) need to have access to reliable wind speed forecasts to organize the airspace efficiently. At cruising altitudes, the only measures that one has access to are measured by airplanes that record the wind along their trajectories, and fortunately, as there are a lot of planes flying in the airspace ATCs have recorded a lot of data. Their interest is to be able to a good prediction during the window of time they operate which is rather short (from 30min up to a few hours). In that range, called nowcasting, one gets the most accurate forecast by extrapolating from the latest measures available rather than trying to solve expensive numerical equations solvers.
+It is in that range that deep learning methods thrive, as meteorological data is often highly available. Sadly these data are recorded along trajectories and are sparse in space, so we cannot use standard methods such as CNN to deal with it. We noticed that it could be a good candidate for Graph Networks are their inductive bias are a good fit for non-regular dataset.
 
-This work will use graph networks to forecast wind speed at cruising altitudes. We will use the \textit{SkySoft ATM MALAT Wind Speed Dataset} \cite{skysoft2021dataset} and starting from a Graph Element Network (GEN) \cite{alet2019gen} implementation, we will analyze the effect of the topology of the graphs and different nodes and edge features on the performance of the model. The implementation of the different models is publicly available \footnote{The code of this work is available at \url{https://github.com/ArnaudPannatier/nml-project}}
+This work will use graph networks to forecast wind speed at cruising altitudes. We will use the \textit{SkySoft ATM MALAT Wind Speed Dataset} \cite{skysoft2021dataset} and starting from a Graph Element Network (GEN) \cite{alet2019gen} implementation, we will analyze the effect of the topology of the graphs and different nodes and edge features on the performance of the model. The implementation of the different models is publicly available. \footnote{The code of this work is available at \url{https://github.com/ArnaudPannatier/nml-project}}
 
 
 \subsection{Problem formulation}
@@ -49,7 +49,7 @@ So we learn this mapping from data using multiple sets of measures corresponding
 \section{Related works}
 
 \subsection{Graph Element Networks (GENs)} \label{ssec:gen}
-Graph Element Networks \cite{alet2019gen} aims to model field transformations using non-regular graphs with nodes in the underlying space $\mathbb{X}$. Each measurement $(x, i)$ is encoded using a small MLP, the initial latent feature of one node is then computed by averaging the embeddings of the measurements based on their distance to the node. The model then processes this latent variable using $T \in \mathbb{N}$ steps of message passing, using the following equations:
+Graph Element Networks \cite{alet2019gen} aims to model field transformations using non-regular graphs with nodes in the underlying space $\mathbb{X}$. Each measurement $(x, i)$ is encoded using a small MLP, the initial latent feature of one node is then computed by averaging the embeddings of the measurements based on their distance to the node. The model then processes this latent variable using $T$ steps of message passing, using the following equations:
 
 \begin{align}
   m_{ij}^{t + 1} = m_e(l_{i}^{t}, l_{j}^{t}) \\
@@ -98,9 +98,9 @@ In this work, we will focus on nodes and edges features as we are using the grap
 
 
 \subsection{Nodes features}
-As described in section~\ref{ssec:gen}, GEN is only using node features that are computed by aggregating the learned embeddings of the measures based on their distance. We will visualize their value in some very unbalanced cases and the effect of the message passing on the features. This will help us to choose the message passing steps and guide us through the analysis of the different graph structures.
+As described in section~\ref{ssec:gen}, GEN is only using node features that are computed by aggregating the learned embeddings of the measures based on their distance. We will visualize the effect of the message passing on the features. This will help us to choose the message passing steps and guide us through the analysis of the different graph structures.
 
-We assume that this part is the most important to get a good model. So we will explore different strategies and measure their impact on the model. First, we will try to use no encoder and aggregate the normalized measured values. With this approach, we delegate the whole processing to the graph networks, and we think this should be already a strong baseline as the outputs values are strongly related to these initial values. We will then try to use fixed sine-cosine positional encodings ~\cite{vaswani2017attention} and 3D positional fixed sine-cosine positional encodings ~\cite{chu2021conditional}. The idea is to use a simple $1d$ positional encoding that takes as input the position $x,y$ or $z$ and maps into a feature space of larger dimensionality. These encodings can be added or concatenated and we will try both approaches to see which one helps during training. A sketch of these positional encodings can be found in Figure \ref{fig:posenc}
+We assume that this part is the most important to get a good model. So we will explore different strategies and measure their impact on the model. First, we will try to use no encoder and aggregate the normalized measured values. With this approach, we delegate the whole processing to the graph networks, and we think this should be already a strong baseline as the outputs values are strongly related to these initial values. We will then try to use fixed sine-cosine positional encodings ~\cite{vaswani2017attention} and 3D positional fixed sine-cosine positional encodings ~\cite{chu2021conditional}. The idea is to use a simple 1D positional encoding that takes as input the position $x,y$ or $z$ and maps into a feature space of larger dimensionality. These encodings can be added or concatenated and we will try both approaches to see which one helps during training. A sketch of these positional encodings can be found in Figure \ref{fig:posenc}.
 
 \begin{figure}
   \begin{subfigure}{0.4\textwidth}
@@ -116,12 +116,12 @@ We assume that this part is the most important to get a good model. So we will e
 \subsection{Edge features}
 A contribution of this work is to add edge features to GENs. We think that good graph networks for space modeling should be able to compute an approximation of the derivatives of values in the graph. We will take the Euler scheme as an inspiration and have an explicit design for edge features that allows this kind of computation. We will make an ablation with learned features and see their effect on the quality of the model.
 
-The inspiration is that the evolution of the wind speed is governed by the local movement equation:
+The inspiration is that the evolution of the wind speed is governed by the local movement equation \cite{meister2004fluids}:
 \begin{equation}
   \rho \mathbf{g} - \nabla p = \rho\frac{d\mathbf{v}}{dt}
 \end{equation}
 
-Roughly when using a traditional solver we will approximate the spatial and temporal derivatives using finite differences:
+Roughly when using a traditional solver we will approximate the spatial and temporal derivatives using finite differences \cite{wiki:cranknicolson}:
 \begin{equation}
   \frac{u_{i}^{n + 1} - u_i^{n}}{\Delta t} = F_{i}^{n}(u,x,t, \frac{\partial u}{\partial x}, i\frac{\partial^2 u}{\partial x^{2}}    )
 \end{equation}
@@ -136,7 +136,7 @@ The four different graphs that we tried are depicted in Figure \ref{fig:graphs}.
 The performance of the different graph types is displayed in Table \ref{tab:graphs}. We ran experiments using ten different seeds, for each node embedding and the position of the graph could be optimized in the case where the structure is fixed.
 We see that allowing positions to move during training (\textsc{Adapt} in the table) are always performing better than their fixed counterpart. Random Graphs are the baseline and we expect them to perform poorly as they are initialized randomly without taking into account additional insight that we can have about the dataset. We see that indeed their performance is worse than the other models, but when the position of the nodes can be optimized Random Networks are on par with the best network structure.
 
-Traditional approaches are using only edges between neighbors we think that they thought that for modeling the dynamics of the wind the information should only influence its neighborhood. However, we found that the best performing graphs (Random Networks with optimized position and Barabasi-Albert graphs) achieve the best performance. This might be due to the presence of hubs and long-range interaction which might helps the models to organize the information hierarchically.
+Traditional approaches are using only edges between neighbors, Their idea might have been that for modeling the dynamics of the wind the information should only influence its neighborhood. However, we found that the best performing graphs (Random Networks with optimized position and Barab\'asi-Albert graphs) achieve the best performance. This might be due to the presence of hubs and long-range interaction which might helps the models to organize the information hierarchically.
 
 
 \begin{figure}[htbp]
@@ -201,7 +201,7 @@ Traditional approaches are using only edges between neighbors we think that they
     \bottomrule
   \end{tabular}
   \caption{
-    We tried different graph topologies for our model that use no embeddings. First, as a baseline, we tried Random Networks, where the position of each node is drawn from $\mathcal{U}(-1,1)$ and where there is an edge between two nodes with probability $p$. Then we tried to use $k$-means to get the position of the nodes and added edges either between the 3 nearest neighbors in the graph or following a Barabasi-Albert procedure. The results are the MSE error on the validation set, we ran ten different seeds to get the standard deviation. All measures are normalized.
+    We tried different graph topologies for our model that use no embeddings. First, as a baseline, we tried Random Networks, where the position of each node is drawn from $\mathcal{U}(-1,1)$ and where there is an edge between two nodes with probability $p$. Then we tried to use $k$-means to get the position of the nodes and added edges either between the 3 nearest neighbors in the graph or following a Barab\'asi-Albert procedure. The results are the MSE error on the validation set, we ran ten different seeds to get the standard deviation. All measures are normalized.
   }
   \label{tab:graphs}
 \end{table*}
@@ -247,7 +247,7 @@ We added edge features to the graph that encode the distance between the nodes o
   F_{ij} = \frac{p_{i} - p_{j}}{d_{ij}}
 \end{align}
 
-where $p_{i}$ corresponds to the position of the $i$-th node. We compute these values before the message passing scheme and we encode them using a small MLP. In theory, the graph network shouldn't need it as by the universal approximation theorem, it should be able to compute it from the node features, but in practice, we see that precomputing these values helps the model as it doesn't have to learn these relations.
+where $p_{i}$ corresponds to the position of the $i$-th node. We compute these values before the message passing scheme and we encode them using a small MLP. In theory, the graph network shouldn't need them as, by the universal approximation theorem, it should be able to compute it from the node features, but in practice, we see that precomputing these values helps the model as it doesn't have to learn these relations.
 
 \begin{table*}
   \label{tab:nodes}
@@ -265,7 +265,7 @@ where $p_{i}$ corresponds to the position of the $i$-th node. We compute these v
 \end{table*}
 
 \section{Conclusion}
-We used graph networks to forecast the wind speed at cruising altitudes on a horizon of 30min. Graph Networks were able to efficiently process measurements sparsely distributed in the space. This architecture has a good inductive bias for this problem as each node is capable of approximating a part of the space. As the dataset at our disposal is sparse with most of the measurements clustered along some main routes, graph networks are more efficient than other grid-based solvers such as traditional PDEs solvers or CNN. We started by reimplementing the architecture presented in \cite{alet2019gen}. We used several graph structures and different node embeddings. We found that using graphs with hubs and edges between far-away nodes helps the model process the information efficiently. We found that the model doesn't need to have special embeddings as the message-passing architecture is powerful enough, but adding a small MLP encoder with concatenated positional encodings helps a bit.
+We used graph networks to forecast the wind speed at cruising altitudes on a horizon of 30min. Graph Networks were able to efficiently process measurements sparsely distributed in the space. This architecture has a good inductive bias for this problem as each node is capable of approximating a part of the space. As the dataset at our disposal is sparse with most of the measurements clustered along some main routes, graph networks are more efficient than other grid-based solvers such as traditional PDEs solvers or CNN. We started by reimplementing the architecture presented in \cite{alet2019gen}. We used several graph structures and different node embeddings. We found that using graphs with hubs and edges between far-away nodes helps the model process the information efficiently. We found that the model doesn't need to have special embeddings as the message-passing architecture is powerful enough, but adding a small MLP encoder with concatenated positional encodings helps a bit. And finally adding edge features to the graph network encoding the finite difference between the node features helped the model to reach the best performance. We think that precomputing these values helps the model as it doesn't need to learn them and they are needed as they are an approximation of the first derivative. Further work might be done exploring these features and their effect on the performance.
 
 
 \bibliographystyle{apalike}
