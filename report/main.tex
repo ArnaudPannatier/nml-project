@@ -127,6 +127,7 @@ Roughly when using a traditional solver we will approximate the spatial and temp
 \end{equation}
 So we think that adding edge features that hold the distance between two nodes can help model the PDEs.
 
+
 \section{Exploitation}
 
 \subsection{Graph Types}
@@ -206,22 +207,24 @@ Traditional approaches are using only edges between neighbors we think that they
 \end{table*}
 
 
-\subsection{Nodes features}
+\subsection{Nodes and Edge features}
 
 \begin{table*}
   \label{tab:nodes}
   \centering
   \begin{tabular}{lcccc} \toprule
-    \multirow{2}{*}{\textbf{Model}}                &                            & \multicolumn{3}{c}{\textbf{Nodes}}                                                          \\ \cmidrule(lr){3-5}
-                                                   &                            & 10                                 & 100                            & 1000                  \\ \hline
-    \multirow{2}{*}{\textbf{No Emb}}               & \scriptsize \textsc{Fixed} & 0.68 \tiny $\pm$ 0.01              & 0.69 \tiny $\pm$ 0.02          & 0.68 \tiny $\pm$ 0.01 \\
-                                                   & \scriptsize \textsc{Adapt} & 0.68 \tiny $\pm$ 0.01              & 0.66 \tiny $\pm$ 0.01          & 0.65 \tiny $\pm$ 0.01 \\
-    \multirow{2}{*}{\textbf{MLP}}                  & \scriptsize \textsc{Fixed} & 0.66 \tiny $\pm$ 0.01              & 0.66 \tiny $\pm$ 0.02          & 0.67 \tiny $\pm$ 0.02 \\
-                                                   & \scriptsize \textsc{Adapt} & 0.66 \tiny $\pm$ 0.01              & 0.64 \tiny $\pm$ 0.01          & 0.64 \tiny $\pm$ 0.03 \\
-    \multirow{2}{*}{\textbf{Added Pos-Enc + MLP}}  & \scriptsize \textsc{Fixed} & 1.03 \tiny $\pm$ 0.04              & 1.06 \tiny $\pm$ 0.02          & 1.04 \tiny $\pm$ 0.02 \\
-                                                   & \scriptsize \textsc{Adapt} & 1.07 \tiny $\pm$ 0.07              & 1.04 \tiny $\pm$ 0.03          & 1.03 \tiny $\pm$ 0.02 \\
-    \multirow{2}{*}{\textbf{Concat Pos-Enc + MLP}} & \scriptsize \textsc{Fixed} & 0.65 \tiny $\pm$ 0.01              & 0.63 \tiny $\pm$ 0.01          & 0.65 \tiny $\pm$ 0.02 \\
-                                                   & \scriptsize \textsc{Adapt} & 0.65 \tiny $\pm$ 0.02              & \textbf{0.63 \tiny $\pm$ 0.01} & 0.64 \tiny $\pm$ 0.01 \\
+    \multirow{2}{*}{\textbf{Model}}                     &                            & \multicolumn{3}{c}{\textbf{Nodes}}                                                          \\ \cmidrule(lr){3-5}
+                                                        &                            & 10                                 & 100                            & 1000                  \\ \hline
+    \multirow{2}{*}{\textbf{No Emb}}                    & \scriptsize \textsc{Fixed} & 0.68 \tiny $\pm$ 0.01              & 0.69 \tiny $\pm$ 0.02          & 0.68 \tiny $\pm$ 0.01 \\
+                                                        & \scriptsize \textsc{Adapt} & 0.68 \tiny $\pm$ 0.01              & 0.66 \tiny $\pm$ 0.01          & 0.65 \tiny $\pm$ 0.01 \\
+    \multirow{2}{*}{\textbf{MLP}}                       & \scriptsize \textsc{Fixed} & 0.66 \tiny $\pm$ 0.01              & 0.66 \tiny $\pm$ 0.02          & 0.67 \tiny $\pm$ 0.02 \\
+                                                        & \scriptsize \textsc{Adapt} & 0.66 \tiny $\pm$ 0.01              & 0.64 \tiny $\pm$ 0.01          & 0.64 \tiny $\pm$ 0.03 \\
+    \multirow{2}{*}{\textbf{Added Pos-Enc,MLP}}         & \scriptsize \textsc{Fixed} & 1.03 \tiny $\pm$ 0.04              & 1.06 \tiny $\pm$ 0.02          & 1.04 \tiny $\pm$ 0.02 \\
+                                                        & \scriptsize \textsc{Adapt} & 1.07 \tiny $\pm$ 0.07              & 1.04 \tiny $\pm$ 0.03          & 1.03 \tiny $\pm$ 0.02 \\
+    \multirow{2}{*}{\textbf{Concat Pos-Enc,MLP}}        & \scriptsize \textsc{Fixed} & 0.65 \tiny $\pm$ 0.01              & 0.63 \tiny $\pm$ 0.01          & 0.65 \tiny $\pm$ 0.02 \\
+                                                        & \scriptsize \textsc{Adapt} & 0.65 \tiny $\pm$ 0.02              & \textbf{0.63 \tiny $\pm$ 0.01} & 0.64 \tiny $\pm$ 0.01 \\
+    \multirow{2}{*}{\textbf{Concat Pos-Enc,MLP,Edges }} & \scriptsize \textsc{Fixed} & 0.XX \tiny $\pm$ 0.XX              & 0.XX \tiny $\pm$ 0.XX          & 0.XX \tiny $\pm$ 0.XX \\
+                                                        & \scriptsize \textsc{Adapt} & 0.XX \tiny $\pm$ 0.XX              & \textbf{0.XX \tiny $\pm$ 0.XX} & 0.XX \tiny $\pm$ 0.XX \\
 
     \bottomrule
   \end{tabular}
@@ -231,6 +234,9 @@ Traditional approaches are using only edges between neighbors we think that they
 \end{table*}
 
 We tried four different ways of embeddings the information in the nodes. The results of the different experiments can be found in Table \ref{tab:nodes}. We ran ten experiments, changing the seed, for each node embedding and the position of the graph could be optimized in the case where the structure is fixed. We first use no embeddings at all, using directly the measurements values. This allowed us to see the processing performed by the network [Fig.\ref{fig:processing}]. We found that using no embeddings and delegating all the processing to the message passing layers was already performing on par with the best models. We think that the models are powerful enough to process the information and that the other approach needs to learn an additional encoding/decoding network which might require longer training to reach the best accuracy. We trained all the models for 10 epochs (but each epoch contains roughly 33 M measurements) so in that range, the simpler model might be easier to learn. The best performing embedding was using an MLP on top of concatenated positional encodings. This might help the model process the information at a different scale and apparently, it helps a little. Finally, we found that adding the positional encodings altogether was decreasing a lot the accuracy of the model. Maybe under this representation distinguishing between positions is harder for the model.
+
+\subsection{Edge Features}
+We added edge features to the graph, that encode the distance between the nodes or the finite difference between the initial node features.
 
 \begin{figure}[htbp]
   \centering
