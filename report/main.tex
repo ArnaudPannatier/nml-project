@@ -33,9 +33,9 @@
 \newpage
 \section{Introduction}
 Air Traffic Controllers (ATC) need to have access to reliable wind speed forecasts to organize the airspace efficiently. At cruising altitudes, the only measures that one has access to are measured by airplanes that record the wind along their trajectories, and fortunately, as there are a lot of planes flying in the airspace ATCs have recorded a lot of data. Their interest is to be able to a good prediction during the window of time they operate which is rather short (30min up to a few hours) In that range, called nowcasting, one gets the most accurate forecast by extrapolating from the latest measures available rather than trying to solve expensive numerical equations solvers.
-It is in that range that deep learning methods can offer a lot, as meteorological data is often highly available. Sadly this data are recorded along trajectories and is sparse in space, so we cannot uses standard methods such as CNN to deal with it. We noticed that it could be a good candidate for Graph Networks are their inductive bias makes them good candidates for this task.
+It is in that range that deep learning methods can offer a lot, as meteorological data is often highly available. Sadly these data are recorded along trajectories and are sparse in space, so we cannot use standard methods such as CNN to deal with it. We noticed that it could be a good candidate for Graph Networks are their inductive bias makes them good candidates for this task.
 
-This work will use graph networks to forecast the wind speed at cruising altitudes. We will use the \textit{SkySoft ATM MALAT Wind Speed Dataset} \cite{skysoft2021dataset} and starting from an Graph Element Network (GEN) \cite{alet2019gen} implementation, we will analyse the effect of the topology of the graphs and different nodes and edge features on the performance of the model. The implementation of the different models is publicly available \footnote{The code of this work is available at \url{https://github.com/ArnaudPannatier/nml-project}}
+This work will use graph networks to forecast wind speed at cruising altitudes. We will use the \textit{SkySoft ATM MALAT Wind Speed Dataset} \cite{skysoft2021dataset} and starting from a Graph Element Network (GEN) \cite{alet2019gen} implementation, we will analyze the effect of the topology of the graphs and different nodes and edge features on the performance of the model. The implementation of the different models is publicly available \footnote{The code of this work is available at \url{https://github.com/ArnaudPannatier/nml-project}}
 
 
 \subsection{Problem formulation}
@@ -44,12 +44,12 @@ Let $\mathbb{X}, \mathbb{I}, \mathbb{O}$ be three bounded metric spaces, and def
 In the case of wind nowcasting, $\mathbb{X} = \mathbb{R}^{3} \times \mathbb{R}^{+}$, which corresponds to 3 spatial coordinates and one temporal and $\mathbb{I} = \mathbb{O} = \mathbb{R}^{2}$ which encode the wind in the $(x,y)$ plane.
 We want to learn the transformation which maps a function $f$ to $g$.
 We only have access to $f$ by data $(x, i)  \in \mathbb{X} \times \mathbb{I}$ of measures $i$ at position $x$ and we know $g$ only through a set $(x', o) \in \mathbb{X} \times \mathbb{O}$ of measurements $o$ at position $x'$.
-So we learn this mapping from data using multiple sets of meaures corresponding to many $(f,g)$ pairs with the objective of minimizing the distance in the output metric space $\mathbb{O}$ between predictions and references.
+So we learn this mapping from data using multiple sets of meaures corresponding to many $(f,g)$ pairs to minimize the distance in the output metric space $\mathbb{O}$ between predictions and references.
 
 \section{Related works}
 
 \subsection{Graph Element Networks (GENs)} \label{ssec:gen}
-Graph Element Networks \cite{alet2019gen} aim to model field transformations using a non-regular graphs with nodes in the underlying space $\mathbb{X}$. Each measurement $(x, i)$ is encoded using a small MLP, the initial latent feature of one node is then computing by averaging the embeddings of the measurements based on their distance to the node. The model then process this latent variable using $T \in \mathbb{N}$ steps of message passing, using the following equations:
+Graph Element Networks \cite{alet2019gen} aim to model field transformations using non-regular graphs with nodes in the underlying space $\mathbb{X}$. Each measurement $(x, i)$ is encoded using a small MLP, the initial latent feature of one node is then computing by averaging the embeddings of the measurements based on their distance to the node. The model then process this latent variable using $T \in \mathbb{N}$ steps of message passing, using the following equations:
 
 \begin{align}
   m_{ij}^{t + 1} = m_e(l_{i}^{t}, l_{j}^{t}) \\
@@ -213,19 +213,16 @@ Traditional approaches are using only edges between neighbors we think that they
   \label{tab:nodes}
   \centering
   \begin{tabular}{lcccc} \toprule
-    \multirow{2}{*}{\textbf{Model}}                     &                            & \multicolumn{3}{c}{\textbf{Nodes}}                                                          \\ \cmidrule(lr){3-5}
-                                                        &                            & 10                                 & 100                            & 1000                  \\ \hline
-    \multirow{2}{*}{\textbf{No Emb}}                    & \scriptsize \textsc{Fixed} & 0.68 \tiny $\pm$ 0.01              & 0.69 \tiny $\pm$ 0.02          & 0.68 \tiny $\pm$ 0.01 \\
-                                                        & \scriptsize \textsc{Adapt} & 0.68 \tiny $\pm$ 0.01              & 0.66 \tiny $\pm$ 0.01          & 0.65 \tiny $\pm$ 0.01 \\
-    \multirow{2}{*}{\textbf{MLP}}                       & \scriptsize \textsc{Fixed} & 0.66 \tiny $\pm$ 0.01              & 0.66 \tiny $\pm$ 0.02          & 0.67 \tiny $\pm$ 0.02 \\
-                                                        & \scriptsize \textsc{Adapt} & 0.66 \tiny $\pm$ 0.01              & 0.64 \tiny $\pm$ 0.01          & 0.64 \tiny $\pm$ 0.03 \\
-    \multirow{2}{*}{\textbf{Added Pos-Enc,MLP}}         & \scriptsize \textsc{Fixed} & 1.03 \tiny $\pm$ 0.04              & 1.06 \tiny $\pm$ 0.02          & 1.04 \tiny $\pm$ 0.02 \\
-                                                        & \scriptsize \textsc{Adapt} & 1.07 \tiny $\pm$ 0.07              & 1.04 \tiny $\pm$ 0.03          & 1.03 \tiny $\pm$ 0.02 \\
-    \multirow{2}{*}{\textbf{Concat Pos-Enc,MLP}}        & \scriptsize \textsc{Fixed} & 0.65 \tiny $\pm$ 0.01              & 0.63 \tiny $\pm$ 0.01          & 0.65 \tiny $\pm$ 0.02 \\
-                                                        & \scriptsize \textsc{Adapt} & 0.65 \tiny $\pm$ 0.02              & \textbf{0.63 \tiny $\pm$ 0.01} & 0.64 \tiny $\pm$ 0.01 \\
-    \multirow{2}{*}{\textbf{Concat Pos-Enc,MLP,Edges }} & \scriptsize \textsc{Fixed} & 0.XX \tiny $\pm$ 0.XX              & 0.XX \tiny $\pm$ 0.XX          & 0.XX \tiny $\pm$ 0.XX \\
-                                                        & \scriptsize \textsc{Adapt} & 0.XX \tiny $\pm$ 0.XX              & \textbf{0.XX \tiny $\pm$ 0.XX} & 0.XX \tiny $\pm$ 0.XX \\
-
+    \multirow{2}{*}{\textbf{Model}}              &                            & \multicolumn{3}{c}{\textbf{Nodes}}                                                          \\ \cmidrule(lr){3-5}
+                                                 &                            & 10                                 & 100                            & 1000                  \\ \hline
+    \multirow{2}{*}{\textbf{No Emb}}             & \scriptsize \textsc{Fixed} & 0.68 \tiny $\pm$ 0.01              & 0.69 \tiny $\pm$ 0.02          & 0.68 \tiny $\pm$ 0.01 \\
+                                                 & \scriptsize \textsc{Adapt} & 0.68 \tiny $\pm$ 0.01              & 0.66 \tiny $\pm$ 0.01          & 0.65 \tiny $\pm$ 0.01 \\
+    \multirow{2}{*}{\textbf{MLP}}                & \scriptsize \textsc{Fixed} & 0.66 \tiny $\pm$ 0.01              & 0.66 \tiny $\pm$ 0.02          & 0.67 \tiny $\pm$ 0.02 \\
+                                                 & \scriptsize \textsc{Adapt} & 0.66 \tiny $\pm$ 0.01              & 0.64 \tiny $\pm$ 0.01          & 0.64 \tiny $\pm$ 0.03 \\
+    \multirow{2}{*}{\textbf{Added Pos-Enc,MLP}}  & \scriptsize \textsc{Fixed} & 1.03 \tiny $\pm$ 0.04              & 1.06 \tiny $\pm$ 0.02          & 1.04 \tiny $\pm$ 0.02 \\
+                                                 & \scriptsize \textsc{Adapt} & 1.07 \tiny $\pm$ 0.07              & 1.04 \tiny $\pm$ 0.03          & 1.03 \tiny $\pm$ 0.02 \\
+    \multirow{2}{*}{\textbf{Concat Pos-Enc,MLP}} & \scriptsize \textsc{Fixed} & 0.65 \tiny $\pm$ 0.01              & 0.63 \tiny $\pm$ 0.01          & 0.65 \tiny $\pm$ 0.02 \\
+                                                 & \scriptsize \textsc{Adapt} & 0.65 \tiny $\pm$ 0.02              & \textbf{0.63 \tiny $\pm$ 0.01} & 0.64 \tiny $\pm$ 0.01 \\
     \bottomrule
   \end{tabular}
   \caption{
@@ -235,9 +232,6 @@ Traditional approaches are using only edges between neighbors we think that they
 
 We tried four different ways of embeddings the information in the nodes. The results of the different experiments can be found in Table \ref{tab:nodes}. We ran ten experiments, changing the seed, for each node embedding and the position of the graph could be optimized in the case where the structure is fixed. We first use no embeddings at all, using directly the measurements values. This allowed us to see the processing performed by the network [Fig.\ref{fig:processing}]. We found that using no embeddings and delegating all the processing to the message passing layers was already performing on par with the best models. We think that the models are powerful enough to process the information and that the other approach needs to learn an additional encoding/decoding network which might require longer training to reach the best accuracy. We trained all the models for 10 epochs (but each epoch contains roughly 33 M measurements) so in that range, the simpler model might be easier to learn. The best performing embedding was using an MLP on top of concatenated positional encodings. This might help the model process the information at a different scale and apparently, it helps a little. Finally, we found that adding the positional encodings altogether was decreasing a lot the accuracy of the model. Maybe under this representation distinguishing between positions is harder for the model.
 
-\subsection{Edge Features}
-We added edge features to the graph, that encode the distance between the nodes or the finite difference between the initial node features.
-
 \begin{figure}[htbp]
   \centering
   \includegraphics[width=\textwidth]{../results/pdfs/ba-100N-noemb0.pdf}
@@ -245,7 +239,30 @@ We added edge features to the graph, that encode the distance between the nodes 
   \label{fig:processing}
 \end{figure}
 
+\subsection{Edge Features}
+We added edge features to the graph that encode the distance between the nodes or the finite difference between the initial node features. These values are computed with the following formulae:
 
+\begin{align}
+  d_{ij} = \Vert p_{i} - p_{j} \Vert_{2} \\
+  F_{ij} = \frac{p_{i} - p_{j}}{d_{ij}}
+\end{align}
+
+where $p_{i}$ corresponds to the position of the $i$-th node. We compute these values before the message passing scheme and we encode them using a small MLP. In theory, the graph network shouldn't need it as by the universal approximation theorem, it should be able to compute it from the node features, but in practice we see that precomputing these values helps the model as it don't have to learn these relations.
+
+\begin{table*}
+  \label{tab:nodes}
+  \centering
+  \begin{tabular}{lcccc} \toprule
+    \multirow{2}{*}{\textbf{Edge Features}} &                            & \multicolumn{3}{c}{\textbf{Nodes}}                                                          \\ \cmidrule(lr){3-5}
+                                            &                            & 10                                 & 100                   & 1000                           \\ \hline
+    \textbf{Encoded distance}               & \scriptsize \textsc{Adapt} & 0.64 \tiny $\pm$ 0.02              & 0.63 \tiny $\pm$ 0.01 & 0.63 \tiny $\pm$ 0.01          \\
+    \textbf{Encoded Finite difference}      & \scriptsize \textsc{Adapt} & 0.64 \tiny $\pm$ 0.02              & 0.63 \tiny $\pm$ 0.01 & \textbf{0.62 \tiny $\pm$ 0.01} \\
+    \bottomrule
+  \end{tabular}
+  \caption{
+    We tried to add edge embeddings corresponding to the distance or the finite-difference between the nodes to our best-performing model. These values are computed before message passing and additionally, they are encoded using a small MLP. With these edge embeddings, we reach the best performance. The results are the MSE error on the validation set, we ran ten different seeds to get the standard deviation. All measures are normalized.
+  }
+\end{table*}
 
 \section{Conclusion}
 We used graph networks to forecast the wind speed at cruising altitudes on a horizon of 30min. Graph Networks were able to efficiently process measurements sparsely distributed in the space. This architecture has a good inductive bias for this problem as each node is capable of approximating a part of the space. As the dataset at our disposal is sparse with most of the measurements clustered along some main routes, graph networks are more efficient than other grid-based solvers such as traditional PDEs solvers or CNN. We started by reimplementing the architecture presented in \cite{alet2019gen}. We used several graph structures and different node embeddings. We found that using graphs with hubs and edges between far-away nodes helps the model process the information efficiently. We found that the model doesn't need to have special embeddings as the message-passing architecture is powerful enough, but adding a small MLP encoder with concatenated positional encodings helps a bit.
