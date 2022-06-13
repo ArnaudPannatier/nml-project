@@ -65,13 +65,9 @@ To predict a value at a new query position, the model linearly extrapolates in l
   \caption{GEN architecture \cite{alet2019gen}. The measures are first encoded to a latent space, then the initial node feature is computed by aggregating the closer encoded measures, the processing is done by message passing and the final measures are retrieved by first interpolating the features of the nodes at the query position and then decoding.}
 \end{figure}
 
-\ap{advantages -- drawbacks}
-
 \subsection{Finite Element Networks}
 
 Traditional PDEs solvers model the domain using regular grids, but this has some drawbacks as some parts of the space might be more complicated to model than the others. One way of dealing with this problem is to use a Finite Element method approach \cite{hughes2012finite}, which uses a non-regular graph that can be denser in the more complex regions and coarser in the smoother regions.
-
-\ap{advantages --drawbacks}
 
 
 \section{Exploration}
