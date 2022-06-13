@@ -1,0 +1,3 @@
+[submodule "slides/beamer_theme"]
+	path = slides/beamer_theme
+	url = git@gitlab.idiap.ch:malat/beamer_theme.git
