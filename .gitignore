@@ -4,3 +4,13 @@ __pycache__/
 *.ipynb_checkpoints/
 .vscode/
 *.out
+*aux
+*.f*
+*.log
+*.sync*
+*.bbl
+*.blg
+*.nav
+*.snm
+*.toc
+*.xdv
