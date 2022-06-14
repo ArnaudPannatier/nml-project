@@ -12,7 +12,7 @@
 
 \author[A. Pannatier]{Arnaud Pannatier}
 
-\title{Graph Networks for wind Nowcasting}
+\title{Graph Networks for Wind Nowcasting}
 \subtitle{EE-452 -- project}
 
 \usepackage{hyperref}
@@ -30,7 +30,7 @@
                 \item Problem formulation
                 \item Graph Network
                       \begin{itemize}
-                          \item Graph Type
+                          \item Graph Types
                           \item Nodes Features
                           \item Edge Features
                       \end{itemize}
@@ -44,6 +44,29 @@
     \end{columns}
 \end{frame}
 
+\begin{frame}
+    \begin{columns}
+        \begin{column}{0.5\textwidth}
+            \begin{figure}[htbp]
+                \includegraphics[height=0.83\textheight]{imgs/dataset.pdf}
+            \end{figure}
+        \end{column}
+        \begin{column}{0.5\textwidth}
+            \coltitle{SKYSOFT ATM MALAT Wind Speed Dataset}
+            \vspace{10pt}
+            \begin{itemize}
+                \item Measures broadcasted every 4s
+                \item Non-regular structure
+                \item \url{https://www.idiap.ch/en/dataset/skysoft}
+                \item \cite{skysoft2021dataset}
+            \end{itemize}
+            \begin{figure}[htbp]
+                \centering
+                \includegraphics[height=0.3\textheight]{beamer_theme/skysoft-logo.png}
+            \end{figure}
+        \end{column}
+    \end{columns}
+\end{frame}
 
 \begin{frame}{\href{https://www.idiap.ch/en/dataset/skysoft}{SKYSOFT ATM MALAT Wind Speed Dataset}}
     \begin{columns}
@@ -64,28 +87,6 @@
     \end{columns}
 \end{frame}
 
-\begin{frame}
-    \begin{columns}
-        \begin{column}{0.5\textwidth}
-            \begin{figure}[htbp]
-                \includegraphics[height=0.83\textheight]{imgs/dataset.pdf}
-            \end{figure}
-        \end{column}
-        \begin{column}{0.5\textwidth}
-            \coltitle{SKYSOFT ATM MALAT Wind Speed Dataset}
-            \vspace{10pt}
-            \begin{itemize}
-                \item Measures broadcasted every 4s
-                \item Non-regular structure
-                \item \url{https://www.idiap.ch/en/dataset/skysoft}
-            \end{itemize}
-            \begin{figure}[htbp]
-                \centering
-                \includegraphics[height=0.3\textheight]{beamer_theme/skysoft-logo.png}
-            \end{figure}
-        \end{column}
-    \end{columns}
-\end{frame}
 \begin{frame}{ Input $\rightarrow$ Target}
     \begin{columns}[T]
         \begin{column}{0.5\textwidth}
@@ -233,7 +234,7 @@
         \multirow{2}{*}{\textbf{Edge Features}} &                            & \multicolumn{3}{c}{\textbf{Nodes}}                                                          \\ \cmidrule(lr){3-5}
                                                 &                            & 10                                 & 100                   & 1000                           \\ \hline
         \textbf{Encoded distance}               & \scriptsize \textsc{Adapt} & 0.64 \tiny $\pm$ 0.02              & 0.63 \tiny $\pm$ 0.01 & 0.63 \tiny $\pm$ 0.01          \\
-        \textbf{Encoded Finite difference}      & \scriptsize \textsc{Adapt} & 0.64 \tiny $\pm$ 0.02              & 0.63 \tiny $\pm$ 0.01 & \textbf{0.62 \tiny $\pm$ 0.01} \\
+        \textbf{Encoded Finite difference}      & \scriptsize \textsc{Adapt} & 0.64 \tiny $\pm$ 0.02              & 0.63 \tiny $\pm$ 0.01 & \textbf{0.62 \tiny $\pm$ 0.01} \\ \hline
         \bottomrule
     \end{tabular}
 \end{frame}
@@ -241,11 +242,11 @@
 \begin{frame}
     \begin{columns}
         \begin{column}{0.4\textwidth}
-            \coltitle{Conclusion}
-
+            \coltitle{Conclusion} \\
+            \vspace{10pt}
             Our best graph network uses:
             \begin{itemize}
-                \item long-range connection and hubs
+                \item Long-range connection and hubs
                 \item Positional Encodings
                 \item Edge features encoding finite differences
             \end{itemize}
@@ -265,5 +266,18 @@
         \bibliographystyle{apalike}
     \end{frame}
 \end{colorframe}
+
+\begin{frame}{Model Comparison}
+    \centering
+    \begin{tabular}{lc} \toprule
+        \textbf{Model}                               & Norm. MSE     \\ \hline
+        CNP \cite{garnelo2018conditional}            & 1.17          \\
+        GKA - MLP \cite{pannatier2022windnowcasting} & 0.71          \\
+        \textbf{Best GN}                             & \textbf{0.62} \\
+        \textbf{Transformer}                         & \textbf{0.62} \\
+        \bottomrule
+    \end{tabular}
+\end{frame}
+
 
 \end{document}
